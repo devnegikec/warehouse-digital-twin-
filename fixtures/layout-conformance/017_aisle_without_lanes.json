@@ -1,0 +1,63 @@
+{
+  "name": "017_aisle_without_lanes",
+  "description": "A valid aisle with no rack rows. A warning, not an error: a traffic-only aisle is a legitimate design, so the layout stays publishable.",
+  "targets": [
+    "AISLE_WITHOUT_LANES"
+  ],
+  "doc": {
+    "schemaVersion": 1,
+    "warehouse": {
+      "code": "WH1",
+      "lengthM": 40,
+      "widthM": 20,
+      "heightM": 8
+    },
+    "rackTypes": [
+      {
+        "id": "rt1",
+        "code": "STD",
+        "bayWidthM": 2.7,
+        "depthM": 1.1
+      }
+    ],
+    "aisles": [
+      {
+        "id": "a19",
+        "code": "A19",
+        "orientation": "X",
+        "centerline": {
+          "x1": 2,
+          "z1": 10,
+          "x2": 38,
+          "z2": 10
+        },
+        "widthM": 3,
+        "lanes": []
+      }
+    ]
+  },
+  "expected": {
+    "publishable": true,
+    "binCount": 0,
+    "bayCount": 0,
+    "diagnosticCodes": [
+      "AISLE_WITHOUT_LANES"
+    ],
+    "diagnostics": [
+      {
+        "severity": "warning",
+        "code": "AISLE_WITHOUT_LANES",
+        "entityRefs": [
+          {
+            "kind": "aisle",
+            "id": "a19",
+            "label": "A19"
+          }
+        ]
+      }
+    ],
+    "docHash": "fbd23de6bbb5cf3c5380ce882450a80ca2750e8db0d669bb2bed8f118c636b00",
+    "firstBinCode": null,
+    "lastBinCode": null
+  }
+}

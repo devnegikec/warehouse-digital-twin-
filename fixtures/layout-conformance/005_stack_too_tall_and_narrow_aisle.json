@@ -1,0 +1,112 @@
+{
+  "name": "005_stack_too_tall_and_narrow_aisle",
+  "description": "Level stack exceeds warehouse height (hard error, blocks publish) while the aisle is narrower than a forklift needs (soft warning, does not). Proves the error/warning split.",
+  "doc": {
+    "schemaVersion": 1,
+    "warehouse": {
+      "code": "WH1",
+      "name": "Fixture Warehouse",
+      "lengthM": 20,
+      "widthM": 12,
+      "heightM": 5
+    },
+    "obstacles": [],
+    "rackTypes": [
+      {
+        "id": "rt1",
+        "code": "STD",
+        "name": "Standard pallet rack",
+        "bayWidthM": 2.7,
+        "depthM": 1.1,
+        "uprightWidthM": 0.12,
+        "uprightDepthM": 0.12
+      }
+    ],
+    "aisles": [
+      {
+        "id": "a5",
+        "code": "A05",
+        "orientation": "X",
+        "centerline": {
+          "x1": 1,
+          "z1": 6,
+          "x2": 19,
+          "z2": 6
+        },
+        "widthM": 2,
+        "lanes": [
+          {
+            "id": "a5l1",
+            "code": "A05-L",
+            "side": "LEFT",
+            "rackTypeId": "rt1",
+            "startOffsetM": 0,
+            "lengthM": 16.2,
+            "levels": [
+              {
+                "clearHeightM": 1.6,
+                "binDepthM": 1,
+                "beamHeightM": 0.08
+              },
+              {
+                "clearHeightM": 1.6,
+                "binDepthM": 1,
+                "beamHeightM": 0.08
+              },
+              {
+                "clearHeightM": 1.6,
+                "binDepthM": 1,
+                "beamHeightM": 0.08
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "expected": {
+    "publishable": false,
+    "binCount": 18,
+    "bayCount": 6,
+    "diagnosticCodes": [
+      "AISLE_TOO_NARROW",
+      "LEVEL_STACK_EXCEEDS_HEIGHT"
+    ],
+    "diagnostics": [
+      {
+        "severity": "warning",
+        "code": "AISLE_TOO_NARROW",
+        "entityRefs": [
+          {
+            "kind": "aisle",
+            "id": "a5",
+            "label": "A05"
+          }
+        ]
+      },
+      {
+        "severity": "error",
+        "code": "LEVEL_STACK_EXCEEDS_HEIGHT",
+        "entityRefs": [
+          {
+            "kind": "lane",
+            "id": "a5l1",
+            "label": "A05-L"
+          },
+          {
+            "kind": "warehouse",
+            "id": "WH1",
+            "label": "WH1"
+          }
+        ],
+        "data": {
+          "stackHeightM": 5.04,
+          "warehouseHeightM": 5
+        }
+      }
+    ],
+    "docHash": "2f54a3241ca601cd8da122440abebf37f815610c6528622ca3bf5704c5c6a05f",
+    "firstBinCode": "WH1/A05/L/B001/L1",
+    "lastBinCode": "WH1/A05/L/B006/L3"
+  }
+}

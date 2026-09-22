@@ -1,0 +1,89 @@
+{
+  "name": "008_zero_length_and_diagonal",
+  "description": "Two degenerate centerlines: one where start and end coincide, one running diagonally. Both aisles abort before any geometry is derived.",
+  "targets": [
+    "AISLE_ZERO_LENGTH",
+    "AISLE_NOT_AXIS_ALIGNED"
+  ],
+  "doc": {
+    "schemaVersion": 1,
+    "warehouse": {
+      "code": "WH1",
+      "lengthM": 40,
+      "widthM": 20,
+      "heightM": 8
+    },
+    "rackTypes": [
+      {
+        "id": "rt1",
+        "code": "STD",
+        "bayWidthM": 2.7,
+        "depthM": 1.1
+      }
+    ],
+    "aisles": [
+      {
+        "id": "a8",
+        "code": "A08",
+        "orientation": "X",
+        "centerline": {
+          "x1": 5,
+          "z1": 5,
+          "x2": 5,
+          "z2": 5
+        },
+        "widthM": 3,
+        "lanes": []
+      },
+      {
+        "id": "a9",
+        "code": "A09",
+        "orientation": "X",
+        "centerline": {
+          "x1": 2,
+          "z1": 15,
+          "x2": 10,
+          "z2": 18
+        },
+        "widthM": 3,
+        "lanes": []
+      }
+    ]
+  },
+  "expected": {
+    "publishable": false,
+    "binCount": 0,
+    "bayCount": 0,
+    "diagnosticCodes": [
+      "AISLE_NOT_AXIS_ALIGNED",
+      "AISLE_ZERO_LENGTH"
+    ],
+    "diagnostics": [
+      {
+        "severity": "error",
+        "code": "AISLE_ZERO_LENGTH",
+        "entityRefs": [
+          {
+            "kind": "aisle",
+            "id": "a8",
+            "label": "A08"
+          }
+        ]
+      },
+      {
+        "severity": "error",
+        "code": "AISLE_NOT_AXIS_ALIGNED",
+        "entityRefs": [
+          {
+            "kind": "aisle",
+            "id": "a9",
+            "label": "A09"
+          }
+        ]
+      }
+    ],
+    "docHash": "e459e17d6eabe18be19200e8a62bf1b10377de16ffce7013238e34460084ec72",
+    "firstBinCode": null,
+    "lastBinCode": null
+  }
+}

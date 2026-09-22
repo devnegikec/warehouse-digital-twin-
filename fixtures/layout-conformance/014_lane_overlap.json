@@ -1,0 +1,109 @@
+{
+  "name": "014_lane_overlap",
+  "description": "Two aisles placed 1 m apart: their LEFT rack faces intersect. This is the fixture that catches 'aisles too close together', which no per-aisle check can see.",
+  "targets": [
+    "LANE_OVERLAP"
+  ],
+  "doc": {
+    "schemaVersion": 1,
+    "warehouse": {
+      "code": "WH1",
+      "lengthM": 40,
+      "widthM": 20,
+      "heightM": 8
+    },
+    "rackTypes": [
+      {
+        "id": "rt1",
+        "code": "STD",
+        "bayWidthM": 2.7,
+        "depthM": 1.1
+      }
+    ],
+    "aisles": [
+      {
+        "id": "a14",
+        "code": "A14",
+        "orientation": "X",
+        "centerline": {
+          "x1": 2,
+          "z1": 10,
+          "x2": 38,
+          "z2": 10
+        },
+        "widthM": 3,
+        "lanes": [
+          {
+            "id": "a14l1",
+            "code": "A14-L",
+            "side": "LEFT",
+            "rackTypeId": "rt1",
+            "lengthM": 27,
+            "levels": [
+              {
+                "clearHeightM": 1.6,
+                "binDepthM": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "a15",
+        "code": "A15",
+        "orientation": "X",
+        "centerline": {
+          "x1": 2,
+          "z1": 9,
+          "x2": 38,
+          "z2": 9
+        },
+        "widthM": 3,
+        "lanes": [
+          {
+            "id": "a15l1",
+            "code": "A15-L",
+            "side": "LEFT",
+            "rackTypeId": "rt1",
+            "lengthM": 27,
+            "levels": [
+              {
+                "clearHeightM": 1.6,
+                "binDepthM": 1
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "expected": {
+    "publishable": false,
+    "binCount": 20,
+    "bayCount": 20,
+    "diagnosticCodes": [
+      "LANE_OVERLAP"
+    ],
+    "diagnostics": [
+      {
+        "severity": "error",
+        "code": "LANE_OVERLAP",
+        "entityRefs": [
+          {
+            "kind": "lane",
+            "id": "A14/A14-L",
+            "label": "A14/A14-L"
+          },
+          {
+            "kind": "lane",
+            "id": "A15/A15-L",
+            "label": "A15/A15-L"
+          }
+        ]
+      }
+    ],
+    "docHash": "0af6fbfc2ebed0b72348132e5015dc2cb82be9b886760301e3f34ff2986e058a",
+    "firstBinCode": "WH1/A14/L/B001/L1",
+    "lastBinCode": "WH1/A15/L/B010/L1"
+  }
+}

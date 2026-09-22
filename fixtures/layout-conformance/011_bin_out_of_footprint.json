@@ -1,0 +1,226 @@
+{
+  "name": "011_bin_out_of_footprint",
+  "description": "The corridor stays inside the footprint but the LEFT lane's bays cross the wall, which is the case a corridor-only check would miss.",
+  "targets": [
+    "BIN_OUT_OF_FOOTPRINT"
+  ],
+  "doc": {
+    "schemaVersion": 1,
+    "warehouse": {
+      "code": "WH1",
+      "lengthM": 40,
+      "widthM": 20,
+      "heightM": 8
+    },
+    "rackTypes": [
+      {
+        "id": "rt1",
+        "code": "STD",
+        "bayWidthM": 2.7,
+        "depthM": 1.1
+      }
+    ],
+    "aisles": [
+      {
+        "id": "a11",
+        "code": "A11",
+        "orientation": "X",
+        "centerline": {
+          "x1": 2,
+          "z1": 2,
+          "x2": 38,
+          "z2": 2
+        },
+        "widthM": 3,
+        "lanes": [
+          {
+            "id": "a11l1",
+            "code": "A11-L",
+            "side": "LEFT",
+            "rackTypeId": "rt1",
+            "lengthM": 27,
+            "levels": [
+              {
+                "clearHeightM": 1.6,
+                "binDepthM": 1
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "expected": {
+    "publishable": false,
+    "binCount": 10,
+    "bayCount": 10,
+    "diagnosticCodes": [
+      "BIN_OUT_OF_FOOTPRINT"
+    ],
+    "diagnostics": [
+      {
+        "severity": "error",
+        "code": "BIN_OUT_OF_FOOTPRINT",
+        "entityRefs": [
+          {
+            "kind": "lane",
+            "id": "a11l1",
+            "label": "A11-L"
+          },
+          {
+            "kind": "bay",
+            "id": "a11l1:1",
+            "label": "B1"
+          }
+        ]
+      },
+      {
+        "severity": "error",
+        "code": "BIN_OUT_OF_FOOTPRINT",
+        "entityRefs": [
+          {
+            "kind": "lane",
+            "id": "a11l1",
+            "label": "A11-L"
+          },
+          {
+            "kind": "bay",
+            "id": "a11l1:2",
+            "label": "B2"
+          }
+        ]
+      },
+      {
+        "severity": "error",
+        "code": "BIN_OUT_OF_FOOTPRINT",
+        "entityRefs": [
+          {
+            "kind": "lane",
+            "id": "a11l1",
+            "label": "A11-L"
+          },
+          {
+            "kind": "bay",
+            "id": "a11l1:3",
+            "label": "B3"
+          }
+        ]
+      },
+      {
+        "severity": "error",
+        "code": "BIN_OUT_OF_FOOTPRINT",
+        "entityRefs": [
+          {
+            "kind": "lane",
+            "id": "a11l1",
+            "label": "A11-L"
+          },
+          {
+            "kind": "bay",
+            "id": "a11l1:4",
+            "label": "B4"
+          }
+        ]
+      },
+      {
+        "severity": "error",
+        "code": "BIN_OUT_OF_FOOTPRINT",
+        "entityRefs": [
+          {
+            "kind": "lane",
+            "id": "a11l1",
+            "label": "A11-L"
+          },
+          {
+            "kind": "bay",
+            "id": "a11l1:5",
+            "label": "B5"
+          }
+        ]
+      },
+      {
+        "severity": "error",
+        "code": "BIN_OUT_OF_FOOTPRINT",
+        "entityRefs": [
+          {
+            "kind": "lane",
+            "id": "a11l1",
+            "label": "A11-L"
+          },
+          {
+            "kind": "bay",
+            "id": "a11l1:6",
+            "label": "B6"
+          }
+        ]
+      },
+      {
+        "severity": "error",
+        "code": "BIN_OUT_OF_FOOTPRINT",
+        "entityRefs": [
+          {
+            "kind": "lane",
+            "id": "a11l1",
+            "label": "A11-L"
+          },
+          {
+            "kind": "bay",
+            "id": "a11l1:7",
+            "label": "B7"
+          }
+        ]
+      },
+      {
+        "severity": "error",
+        "code": "BIN_OUT_OF_FOOTPRINT",
+        "entityRefs": [
+          {
+            "kind": "lane",
+            "id": "a11l1",
+            "label": "A11-L"
+          },
+          {
+            "kind": "bay",
+            "id": "a11l1:8",
+            "label": "B8"
+          }
+        ]
+      },
+      {
+        "severity": "error",
+        "code": "BIN_OUT_OF_FOOTPRINT",
+        "entityRefs": [
+          {
+            "kind": "lane",
+            "id": "a11l1",
+            "label": "A11-L"
+          },
+          {
+            "kind": "bay",
+            "id": "a11l1:9",
+            "label": "B9"
+          }
+        ]
+      },
+      {
+        "severity": "error",
+        "code": "BIN_OUT_OF_FOOTPRINT",
+        "entityRefs": [
+          {
+            "kind": "lane",
+            "id": "a11l1",
+            "label": "A11-L"
+          },
+          {
+            "kind": "bay",
+            "id": "a11l1:10",
+            "label": "B10"
+          }
+        ]
+      }
+    ],
+    "docHash": "a51213f410ec90474ac0faa25e23e2f57df011890d85dae9c678b8e6557007d7",
+    "firstBinCode": "WH1/A11/L/B001/L1",
+    "lastBinCode": "WH1/A11/L/B010/L1"
+  }
+}

@@ -1,0 +1,93 @@
+{
+  "name": "002_both_sides_vertical_aisle",
+  "description": "Aisle running along Z with lanes on both sides. Proves 90-degree rotation and that LEFT/RIGHT resolve against the travel direction, not the world axes.",
+  "doc": {
+    "schemaVersion": 1,
+    "warehouse": {
+      "code": "WH1",
+      "name": "Fixture Warehouse",
+      "lengthM": 25,
+      "widthM": 25,
+      "heightM": 8
+    },
+    "obstacles": [],
+    "rackTypes": [
+      {
+        "id": "rt1",
+        "code": "STD",
+        "name": "Standard pallet rack",
+        "bayWidthM": 2.7,
+        "depthM": 1.1,
+        "uprightWidthM": 0.12,
+        "uprightDepthM": 0.12
+      }
+    ],
+    "aisles": [
+      {
+        "id": "a2",
+        "code": "A02",
+        "orientation": "Z",
+        "centerline": {
+          "x1": 10,
+          "z1": 2,
+          "x2": 10,
+          "z2": 18
+        },
+        "widthM": 3.2,
+        "travelDirection": "BOTH",
+        "lanes": [
+          {
+            "id": "a2l1",
+            "code": "A02-L",
+            "side": "LEFT",
+            "rackTypeId": "rt1",
+            "startOffsetM": 0,
+            "lengthM": 10.8,
+            "levels": [
+              {
+                "clearHeightM": 1.4,
+                "binDepthM": 1,
+                "beamHeightM": 0.08
+              },
+              {
+                "clearHeightM": 1.4,
+                "binDepthM": 1,
+                "beamHeightM": 0.08
+              }
+            ]
+          },
+          {
+            "id": "a2l2",
+            "code": "A02-R",
+            "side": "RIGHT",
+            "rackTypeId": "rt1",
+            "startOffsetM": 0,
+            "lengthM": 10.8,
+            "levels": [
+              {
+                "clearHeightM": 1.4,
+                "binDepthM": 1,
+                "beamHeightM": 0.08
+              },
+              {
+                "clearHeightM": 1.4,
+                "binDepthM": 1,
+                "beamHeightM": 0.08
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "expected": {
+    "publishable": true,
+    "binCount": 16,
+    "bayCount": 8,
+    "diagnosticCodes": [],
+    "diagnostics": [],
+    "docHash": "6545c7b89ce5ddd783c5b93a80f6ad9931013445cd8b97c217a24164b1440fd1",
+    "firstBinCode": "WH1/A02/L/B001/L1",
+    "lastBinCode": "WH1/A02/R/B004/L2"
+  }
+}

@@ -1,0 +1,477 @@
+{
+  "name": "019_diagnostics_truncated",
+  "description": "A narrow bay width produces 36 bays that all cross the wall. That exceeds the per-code reporting cap of 25, so the collector reports the first 25 and summarises the remaining 11 in a single DIAGNOSTICS_TRUNCATED entry instead of flooding the panel.",
+  "targets": [
+    "BIN_OUT_OF_FOOTPRINT",
+    "DIAGNOSTICS_TRUNCATED"
+  ],
+  "doc": {
+    "schemaVersion": 1,
+    "warehouse": {
+      "code": "WH1",
+      "lengthM": 40,
+      "widthM": 20,
+      "heightM": 8
+    },
+    "rackTypes": [
+      {
+        "id": "rt1",
+        "code": "NARROW",
+        "bayWidthM": 1,
+        "depthM": 1.1
+      }
+    ],
+    "aisles": [
+      {
+        "id": "a21",
+        "code": "A21",
+        "orientation": "X",
+        "centerline": {
+          "x1": 2,
+          "z1": 2,
+          "x2": 38,
+          "z2": 2
+        },
+        "widthM": 3,
+        "lanes": [
+          {
+            "id": "a21l1",
+            "code": "A21-L",
+            "side": "LEFT",
+            "rackTypeId": "rt1",
+            "lengthM": 36,
+            "levels": [
+              {
+                "clearHeightM": 1.6,
+                "binDepthM": 1
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "expected": {
+    "publishable": false,
+    "binCount": 36,
+    "bayCount": 36,
+    "diagnosticCodes": [
+      "BIN_OUT_OF_FOOTPRINT",
+      "DIAGNOSTICS_TRUNCATED"
+    ],
+    "diagnostics": [
+      {
+        "severity": "error",
+        "code": "BIN_OUT_OF_FOOTPRINT",
+        "entityRefs": [
+          {
+            "kind": "lane",
+            "id": "a21l1",
+            "label": "A21-L"
+          },
+          {
+            "kind": "bay",
+            "id": "a21l1:1",
+            "label": "B1"
+          }
+        ]
+      },
+      {
+        "severity": "error",
+        "code": "BIN_OUT_OF_FOOTPRINT",
+        "entityRefs": [
+          {
+            "kind": "lane",
+            "id": "a21l1",
+            "label": "A21-L"
+          },
+          {
+            "kind": "bay",
+            "id": "a21l1:2",
+            "label": "B2"
+          }
+        ]
+      },
+      {
+        "severity": "error",
+        "code": "BIN_OUT_OF_FOOTPRINT",
+        "entityRefs": [
+          {
+            "kind": "lane",
+            "id": "a21l1",
+            "label": "A21-L"
+          },
+          {
+            "kind": "bay",
+            "id": "a21l1:3",
+            "label": "B3"
+          }
+        ]
+      },
+      {
+        "severity": "error",
+        "code": "BIN_OUT_OF_FOOTPRINT",
+        "entityRefs": [
+          {
+            "kind": "lane",
+            "id": "a21l1",
+            "label": "A21-L"
+          },
+          {
+            "kind": "bay",
+            "id": "a21l1:4",
+            "label": "B4"
+          }
+        ]
+      },
+      {
+        "severity": "error",
+        "code": "BIN_OUT_OF_FOOTPRINT",
+        "entityRefs": [
+          {
+            "kind": "lane",
+            "id": "a21l1",
+            "label": "A21-L"
+          },
+          {
+            "kind": "bay",
+            "id": "a21l1:5",
+            "label": "B5"
+          }
+        ]
+      },
+      {
+        "severity": "error",
+        "code": "BIN_OUT_OF_FOOTPRINT",
+        "entityRefs": [
+          {
+            "kind": "lane",
+            "id": "a21l1",
+            "label": "A21-L"
+          },
+          {
+            "kind": "bay",
+            "id": "a21l1:6",
+            "label": "B6"
+          }
+        ]
+      },
+      {
+        "severity": "error",
+        "code": "BIN_OUT_OF_FOOTPRINT",
+        "entityRefs": [
+          {
+            "kind": "lane",
+            "id": "a21l1",
+            "label": "A21-L"
+          },
+          {
+            "kind": "bay",
+            "id": "a21l1:7",
+            "label": "B7"
+          }
+        ]
+      },
+      {
+        "severity": "error",
+        "code": "BIN_OUT_OF_FOOTPRINT",
+        "entityRefs": [
+          {
+            "kind": "lane",
+            "id": "a21l1",
+            "label": "A21-L"
+          },
+          {
+            "kind": "bay",
+            "id": "a21l1:8",
+            "label": "B8"
+          }
+        ]
+      },
+      {
+        "severity": "error",
+        "code": "BIN_OUT_OF_FOOTPRINT",
+        "entityRefs": [
+          {
+            "kind": "lane",
+            "id": "a21l1",
+            "label": "A21-L"
+          },
+          {
+            "kind": "bay",
+            "id": "a21l1:9",
+            "label": "B9"
+          }
+        ]
+      },
+      {
+        "severity": "error",
+        "code": "BIN_OUT_OF_FOOTPRINT",
+        "entityRefs": [
+          {
+            "kind": "lane",
+            "id": "a21l1",
+            "label": "A21-L"
+          },
+          {
+            "kind": "bay",
+            "id": "a21l1:10",
+            "label": "B10"
+          }
+        ]
+      },
+      {
+        "severity": "error",
+        "code": "BIN_OUT_OF_FOOTPRINT",
+        "entityRefs": [
+          {
+            "kind": "lane",
+            "id": "a21l1",
+            "label": "A21-L"
+          },
+          {
+            "kind": "bay",
+            "id": "a21l1:11",
+            "label": "B11"
+          }
+        ]
+      },
+      {
+        "severity": "error",
+        "code": "BIN_OUT_OF_FOOTPRINT",
+        "entityRefs": [
+          {
+            "kind": "lane",
+            "id": "a21l1",
+            "label": "A21-L"
+          },
+          {
+            "kind": "bay",
+            "id": "a21l1:12",
+            "label": "B12"
+          }
+        ]
+      },
+      {
+        "severity": "error",
+        "code": "BIN_OUT_OF_FOOTPRINT",
+        "entityRefs": [
+          {
+            "kind": "lane",
+            "id": "a21l1",
+            "label": "A21-L"
+          },
+          {
+            "kind": "bay",
+            "id": "a21l1:13",
+            "label": "B13"
+          }
+        ]
+      },
+      {
+        "severity": "error",
+        "code": "BIN_OUT_OF_FOOTPRINT",
+        "entityRefs": [
+          {
+            "kind": "lane",
+            "id": "a21l1",
+            "label": "A21-L"
+          },
+          {
+            "kind": "bay",
+            "id": "a21l1:14",
+            "label": "B14"
+          }
+        ]
+      },
+      {
+        "severity": "error",
+        "code": "BIN_OUT_OF_FOOTPRINT",
+        "entityRefs": [
+          {
+            "kind": "lane",
+            "id": "a21l1",
+            "label": "A21-L"
+          },
+          {
+            "kind": "bay",
+            "id": "a21l1:15",
+            "label": "B15"
+          }
+        ]
+      },
+      {
+        "severity": "error",
+        "code": "BIN_OUT_OF_FOOTPRINT",
+        "entityRefs": [
+          {
+            "kind": "lane",
+            "id": "a21l1",
+            "label": "A21-L"
+          },
+          {
+            "kind": "bay",
+            "id": "a21l1:16",
+            "label": "B16"
+          }
+        ]
+      },
+      {
+        "severity": "error",
+        "code": "BIN_OUT_OF_FOOTPRINT",
+        "entityRefs": [
+          {
+            "kind": "lane",
+            "id": "a21l1",
+            "label": "A21-L"
+          },
+          {
+            "kind": "bay",
+            "id": "a21l1:17",
+            "label": "B17"
+          }
+        ]
+      },
+      {
+        "severity": "error",
+        "code": "BIN_OUT_OF_FOOTPRINT",
+        "entityRefs": [
+          {
+            "kind": "lane",
+            "id": "a21l1",
+            "label": "A21-L"
+          },
+          {
+            "kind": "bay",
+            "id": "a21l1:18",
+            "label": "B18"
+          }
+        ]
+      },
+      {
+        "severity": "error",
+        "code": "BIN_OUT_OF_FOOTPRINT",
+        "entityRefs": [
+          {
+            "kind": "lane",
+            "id": "a21l1",
+            "label": "A21-L"
+          },
+          {
+            "kind": "bay",
+            "id": "a21l1:19",
+            "label": "B19"
+          }
+        ]
+      },
+      {
+        "severity": "error",
+        "code": "BIN_OUT_OF_FOOTPRINT",
+        "entityRefs": [
+          {
+            "kind": "lane",
+            "id": "a21l1",
+            "label": "A21-L"
+          },
+          {
+            "kind": "bay",
+            "id": "a21l1:20",
+            "label": "B20"
+          }
+        ]
+      },
+      {
+        "severity": "error",
+        "code": "BIN_OUT_OF_FOOTPRINT",
+        "entityRefs": [
+          {
+            "kind": "lane",
+            "id": "a21l1",
+            "label": "A21-L"
+          },
+          {
+            "kind": "bay",
+            "id": "a21l1:21",
+            "label": "B21"
+          }
+        ]
+      },
+      {
+        "severity": "error",
+        "code": "BIN_OUT_OF_FOOTPRINT",
+        "entityRefs": [
+          {
+            "kind": "lane",
+            "id": "a21l1",
+            "label": "A21-L"
+          },
+          {
+            "kind": "bay",
+            "id": "a21l1:22",
+            "label": "B22"
+          }
+        ]
+      },
+      {
+        "severity": "error",
+        "code": "BIN_OUT_OF_FOOTPRINT",
+        "entityRefs": [
+          {
+            "kind": "lane",
+            "id": "a21l1",
+            "label": "A21-L"
+          },
+          {
+            "kind": "bay",
+            "id": "a21l1:23",
+            "label": "B23"
+          }
+        ]
+      },
+      {
+        "severity": "error",
+        "code": "BIN_OUT_OF_FOOTPRINT",
+        "entityRefs": [
+          {
+            "kind": "lane",
+            "id": "a21l1",
+            "label": "A21-L"
+          },
+          {
+            "kind": "bay",
+            "id": "a21l1:24",
+            "label": "B24"
+          }
+        ]
+      },
+      {
+        "severity": "error",
+        "code": "BIN_OUT_OF_FOOTPRINT",
+        "entityRefs": [
+          {
+            "kind": "lane",
+            "id": "a21l1",
+            "label": "A21-L"
+          },
+          {
+            "kind": "bay",
+            "id": "a21l1:25",
+            "label": "B25"
+          }
+        ]
+      },
+      {
+        "severity": "warning",
+        "code": "DIAGNOSTICS_TRUNCATED",
+        "entityRefs": [],
+        "data": {
+          "originalCode": "BIN_OUT_OF_FOOTPRINT",
+          "suppressed": 11
+        }
+      }
+    ],
+    "docHash": "f7e3eedabb7e7ab754762beec7e690e740ac06a95f3a20c34b67fd8f097841c9",
+    "firstBinCode": "WH1/A21/L/B001/L1",
+    "lastBinCode": "WH1/A21/L/B036/L1"
+  }
+}

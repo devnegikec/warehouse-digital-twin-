@@ -1,0 +1,111 @@
+{
+  "name": "018_zero_bays_and_no_rack_segment",
+  "description": "Two lanes that yield no bins for different reasons: one is shorter than a single bay, the other is entirely a GAP segment. Both are warnings.",
+  "targets": [
+    "LANE_ZERO_BAYS",
+    "LANE_HAS_NO_RACK_SEGMENT"
+  ],
+  "doc": {
+    "schemaVersion": 1,
+    "warehouse": {
+      "code": "WH1",
+      "lengthM": 40,
+      "widthM": 20,
+      "heightM": 8
+    },
+    "rackTypes": [
+      {
+        "id": "rt1",
+        "code": "STD",
+        "bayWidthM": 2.7,
+        "depthM": 1.1
+      }
+    ],
+    "aisles": [
+      {
+        "id": "a20",
+        "code": "A20",
+        "orientation": "X",
+        "centerline": {
+          "x1": 2,
+          "z1": 10,
+          "x2": 38,
+          "z2": 10
+        },
+        "widthM": 3,
+        "lanes": [
+          {
+            "id": "a20l1",
+            "code": "A20-L1",
+            "side": "LEFT",
+            "rackTypeId": "rt1",
+            "lengthM": 2,
+            "levels": [
+              {
+                "clearHeightM": 1.6,
+                "binDepthM": 1
+              }
+            ]
+          },
+          {
+            "id": "a20l2",
+            "code": "A20-L2",
+            "side": "LEFT",
+            "rackTypeId": "rt1",
+            "lengthM": 10.8,
+            "levels": [
+              {
+                "clearHeightM": 1.6,
+                "binDepthM": 1
+              }
+            ],
+            "segments": [
+              {
+                "kind": "GAP",
+                "startM": 0,
+                "endM": 10.8,
+                "label": "Cross-aisle"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "expected": {
+    "publishable": true,
+    "binCount": 0,
+    "bayCount": 4,
+    "diagnosticCodes": [
+      "LANE_HAS_NO_RACK_SEGMENT",
+      "LANE_ZERO_BAYS"
+    ],
+    "diagnostics": [
+      {
+        "severity": "warning",
+        "code": "LANE_ZERO_BAYS",
+        "entityRefs": [
+          {
+            "kind": "lane",
+            "id": "a20l1",
+            "label": "A20-L1"
+          }
+        ]
+      },
+      {
+        "severity": "warning",
+        "code": "LANE_HAS_NO_RACK_SEGMENT",
+        "entityRefs": [
+          {
+            "kind": "lane",
+            "id": "a20l2",
+            "label": "A20-L2"
+          }
+        ]
+      }
+    ],
+    "docHash": "a911466233dfaabf326c1b241bb9865a5b4af997c1bfcf543fbff7451474f5cd",
+    "firstBinCode": null,
+    "lastBinCode": null
+  }
+}

@@ -1,0 +1,93 @@
+{
+  "name": "012_aisle_obstacle_overlap",
+  "description": "A column intrudes into the driving corridor but not into either rack face, so only the corridor rule fires and the bins are unaffected.",
+  "targets": [
+    "AISLE_OBSTACLE_OVERLAP"
+  ],
+  "doc": {
+    "schemaVersion": 1,
+    "warehouse": {
+      "code": "WH1",
+      "lengthM": 40,
+      "widthM": 20,
+      "heightM": 8
+    },
+    "obstacles": [
+      {
+        "id": "ob1",
+        "kind": "COLUMN",
+        "x": 12,
+        "z": 9.6,
+        "widthM": 1,
+        "depthM": 1,
+        "heightM": 3
+      }
+    ],
+    "rackTypes": [
+      {
+        "id": "rt1",
+        "code": "STD",
+        "bayWidthM": 2.7,
+        "depthM": 1.1
+      }
+    ],
+    "aisles": [
+      {
+        "id": "a12",
+        "code": "A12",
+        "orientation": "X",
+        "centerline": {
+          "x1": 2,
+          "z1": 10,
+          "x2": 38,
+          "z2": 10
+        },
+        "widthM": 3,
+        "lanes": [
+          {
+            "id": "a12l1",
+            "code": "A12-L",
+            "side": "LEFT",
+            "rackTypeId": "rt1",
+            "lengthM": 27,
+            "levels": [
+              {
+                "clearHeightM": 1.6,
+                "binDepthM": 1
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "expected": {
+    "publishable": false,
+    "binCount": 10,
+    "bayCount": 10,
+    "diagnosticCodes": [
+      "AISLE_OBSTACLE_OVERLAP"
+    ],
+    "diagnostics": [
+      {
+        "severity": "error",
+        "code": "AISLE_OBSTACLE_OVERLAP",
+        "entityRefs": [
+          {
+            "kind": "aisle",
+            "id": "a12",
+            "label": "A12"
+          },
+          {
+            "kind": "obstacle",
+            "id": "ob1",
+            "label": "COLUMN"
+          }
+        ]
+      }
+    ],
+    "docHash": "1c874666ebc778f070dad4684c5919aefc7a6fd0d1ddf84d05b6233af0781947",
+    "firstBinCode": "WH1/A12/L/B001/L1",
+    "lastBinCode": "WH1/A12/L/B010/L1"
+  }
+}

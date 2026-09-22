@@ -1,0 +1,82 @@
+{
+  "name": "015_bin_code_duplicate",
+  "description": "A bin code pattern that does not disambiguate bays or levels, so every bin in the lane collides. Reported once per offending code with its total count, not once per colliding bin. A single lane is used deliberately to keep LANE_OVERLAP out of the picture.",
+  "targets": [
+    "BIN_CODE_DUPLICATE"
+  ],
+  "doc": {
+    "schemaVersion": 1,
+    "warehouse": {
+      "code": "WH1",
+      "lengthM": 40,
+      "widthM": 20,
+      "heightM": 8
+    },
+    "rackTypes": [
+      {
+        "id": "rt1",
+        "code": "STD",
+        "bayWidthM": 2.7,
+        "depthM": 1.1
+      }
+    ],
+    "aisles": [
+      {
+        "id": "a16",
+        "code": "A16",
+        "orientation": "X",
+        "centerline": {
+          "x1": 2,
+          "z1": 10,
+          "x2": 38,
+          "z2": 10
+        },
+        "widthM": 3,
+        "lanes": [
+          {
+            "id": "a16l1",
+            "code": "A16-L",
+            "side": "LEFT",
+            "rackTypeId": "rt1",
+            "lengthM": 27,
+            "levels": [
+              {
+                "clearHeightM": 1.6,
+                "binDepthM": 1
+              }
+            ],
+            "binCodePattern": "{warehouse}/{aisle}"
+          }
+        ]
+      }
+    ]
+  },
+  "expected": {
+    "publishable": false,
+    "binCount": 10,
+    "bayCount": 10,
+    "diagnosticCodes": [
+      "BIN_CODE_DUPLICATE"
+    ],
+    "diagnostics": [
+      {
+        "severity": "error",
+        "code": "BIN_CODE_DUPLICATE",
+        "entityRefs": [
+          {
+            "kind": "lane",
+            "id": "a16l1",
+            "label": "A16-L"
+          }
+        ],
+        "data": {
+          "code": "WH1/A16",
+          "count": 10
+        }
+      }
+    ],
+    "docHash": "68b27bf66615ee5294772eec700262378ff011f0c4758271872e1f8a06fae92b",
+    "firstBinCode": "WH1/A16",
+    "lastBinCode": "WH1/A16"
+  }
+}

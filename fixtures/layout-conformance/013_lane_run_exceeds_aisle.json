@@ -1,0 +1,82 @@
+{
+  "name": "013_lane_run_exceeds_aisle",
+  "description": "The rack run is longer than the aisle centerline. Bays are still derived and remain inside the footprint, so only the run check fires.",
+  "targets": [
+    "LANE_RUN_EXCEEDS_AISLE"
+  ],
+  "doc": {
+    "schemaVersion": 1,
+    "warehouse": {
+      "code": "WH1",
+      "lengthM": 40,
+      "widthM": 20,
+      "heightM": 8
+    },
+    "rackTypes": [
+      {
+        "id": "rt1",
+        "code": "STD",
+        "bayWidthM": 2.7,
+        "depthM": 1.1
+      }
+    ],
+    "aisles": [
+      {
+        "id": "a13",
+        "code": "A13",
+        "orientation": "X",
+        "centerline": {
+          "x1": 2,
+          "z1": 10,
+          "x2": 38,
+          "z2": 10
+        },
+        "widthM": 3,
+        "lanes": [
+          {
+            "id": "a13l1",
+            "code": "A13-L",
+            "side": "LEFT",
+            "rackTypeId": "rt1",
+            "lengthM": 37.8,
+            "levels": [
+              {
+                "clearHeightM": 1.6,
+                "binDepthM": 1
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "expected": {
+    "publishable": false,
+    "binCount": 14,
+    "bayCount": 14,
+    "diagnosticCodes": [
+      "LANE_RUN_EXCEEDS_AISLE"
+    ],
+    "diagnostics": [
+      {
+        "severity": "error",
+        "code": "LANE_RUN_EXCEEDS_AISLE",
+        "entityRefs": [
+          {
+            "kind": "lane",
+            "id": "a13l1",
+            "label": "A13-L"
+          },
+          {
+            "kind": "aisle",
+            "id": "a13",
+            "label": "A13"
+          }
+        ]
+      }
+    ],
+    "docHash": "dc886faf59ac3fbf6d630b1c77b4aa16dd4dff74d190898209316522a83c7721",
+    "firstBinCode": "WH1/A13/L/B001/L1",
+    "lastBinCode": "WH1/A13/L/B014/L1"
+  }
+}

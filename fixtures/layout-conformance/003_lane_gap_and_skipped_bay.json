@@ -1,0 +1,94 @@
+{
+  "name": "003_lane_gap_and_skipped_bay",
+  "description": "One lane split into RACK / GAP / RACK segments (a doorway mid-run) plus an explicitly skipped bay. Exercises in-lane splits and skipped bays.",
+  "doc": {
+    "schemaVersion": 1,
+    "warehouse": {
+      "code": "WH1",
+      "name": "Fixture Warehouse",
+      "lengthM": 40,
+      "widthM": 20,
+      "heightM": 8
+    },
+    "obstacles": [],
+    "rackTypes": [
+      {
+        "id": "rt1",
+        "code": "STD",
+        "name": "Standard pallet rack",
+        "bayWidthM": 2.7,
+        "depthM": 1.1,
+        "uprightWidthM": 0.12,
+        "uprightDepthM": 0.12
+      }
+    ],
+    "aisles": [
+      {
+        "id": "a3",
+        "code": "A03",
+        "orientation": "X",
+        "centerline": {
+          "x1": 2,
+          "z1": 10,
+          "x2": 38,
+          "z2": 10
+        },
+        "widthM": 3,
+        "travelDirection": "BOTH",
+        "lanes": [
+          {
+            "id": "a3l1",
+            "code": "A03-L",
+            "side": "LEFT",
+            "rackTypeId": "rt1",
+            "startOffsetM": 0,
+            "lengthM": 27,
+            "levels": [
+              {
+                "clearHeightM": 1.6,
+                "binDepthM": 1,
+                "beamHeightM": 0.08
+              },
+              {
+                "clearHeightM": 1.6,
+                "binDepthM": 1,
+                "beamHeightM": 0.08
+              }
+            ],
+            "segments": [
+              {
+                "kind": "RACK",
+                "startM": 0,
+                "endM": 10.8
+              },
+              {
+                "kind": "GAP",
+                "startM": 10.8,
+                "endM": 16.2,
+                "label": "Doorway"
+              },
+              {
+                "kind": "RACK",
+                "startM": 16.2,
+                "endM": 27
+              }
+            ],
+            "skipBays": [
+              1
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "expected": {
+    "publishable": true,
+    "binCount": 14,
+    "bayCount": 10,
+    "diagnosticCodes": [],
+    "diagnostics": [],
+    "docHash": "0472d0d8282e3393b89225826af01e4578cd0475ac3c51b21e6eb1858712d9b5",
+    "firstBinCode": "WH1/A03/L/B002/L1",
+    "lastBinCode": "WH1/A03/L/B010/L2"
+  }
+}

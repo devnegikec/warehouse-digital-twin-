@@ -1,0 +1,21 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: warehouse3d-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: warehouse
+      POSTGRES_PASSWORD: warehouse
+      POSTGRES_DB: warehouse
+    ports:
+      - '5433:5432'
+    volumes:
+      - warehouse3d-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U warehouse -d warehouse']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  warehouse3d-pgdata:

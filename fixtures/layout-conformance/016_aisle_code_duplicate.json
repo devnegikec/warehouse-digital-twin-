@@ -1,0 +1,104 @@
+{
+  "name": "016_aisle_code_duplicate",
+  "description": "Two aisles share a code. They use opposite sides so the bin codes stay distinct, isolating the aisle-code check.",
+  "targets": [
+    "AISLE_CODE_DUPLICATE"
+  ],
+  "doc": {
+    "schemaVersion": 1,
+    "warehouse": {
+      "code": "WH1",
+      "lengthM": 40,
+      "widthM": 20,
+      "heightM": 8
+    },
+    "rackTypes": [
+      {
+        "id": "rt1",
+        "code": "STD",
+        "bayWidthM": 2.7,
+        "depthM": 1.1
+      }
+    ],
+    "aisles": [
+      {
+        "id": "a17",
+        "code": "A17",
+        "orientation": "X",
+        "centerline": {
+          "x1": 2,
+          "z1": 4,
+          "x2": 38,
+          "z2": 4
+        },
+        "widthM": 3,
+        "lanes": [
+          {
+            "id": "a17l1",
+            "code": "A17-L",
+            "side": "LEFT",
+            "rackTypeId": "rt1",
+            "lengthM": 27,
+            "levels": [
+              {
+                "clearHeightM": 1.6,
+                "binDepthM": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "a18",
+        "code": "A17",
+        "orientation": "X",
+        "centerline": {
+          "x1": 2,
+          "z1": 16,
+          "x2": 38,
+          "z2": 16
+        },
+        "widthM": 3,
+        "lanes": [
+          {
+            "id": "a18l1",
+            "code": "A17-R",
+            "side": "RIGHT",
+            "rackTypeId": "rt1",
+            "lengthM": 27,
+            "levels": [
+              {
+                "clearHeightM": 1.6,
+                "binDepthM": 1
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "expected": {
+    "publishable": false,
+    "binCount": 20,
+    "bayCount": 20,
+    "diagnosticCodes": [
+      "AISLE_CODE_DUPLICATE"
+    ],
+    "diagnostics": [
+      {
+        "severity": "error",
+        "code": "AISLE_CODE_DUPLICATE",
+        "entityRefs": [
+          {
+            "kind": "aisle",
+            "id": "a18",
+            "label": "A17"
+          }
+        ]
+      }
+    ],
+    "docHash": "b982b1ea507e827848171145da1304fea86859bb03103f6e1c24a736fa38fb5e",
+    "firstBinCode": "WH1/A17/L/B001/L1",
+    "lastBinCode": "WH1/A17/R/B010/L1"
+  }
+}

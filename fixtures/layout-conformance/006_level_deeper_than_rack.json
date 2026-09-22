@@ -1,0 +1,87 @@
+{
+  "name": "006_level_deeper_than_rack",
+  "description": "A level is configured deeper than the structural rack frame. Warning only: the geometry still compiles, but it is physically dubious.",
+  "doc": {
+    "schemaVersion": 1,
+    "warehouse": {
+      "code": "WH1",
+      "name": "Fixture Warehouse",
+      "lengthM": 30,
+      "widthM": 20,
+      "heightM": 8
+    },
+    "obstacles": [],
+    "rackTypes": [
+      {
+        "id": "rt1",
+        "code": "STD",
+        "name": "Standard pallet rack",
+        "bayWidthM": 2.7,
+        "depthM": 1.1,
+        "uprightWidthM": 0.12,
+        "uprightDepthM": 0.12
+      }
+    ],
+    "aisles": [
+      {
+        "id": "a6",
+        "code": "A06",
+        "orientation": "X",
+        "centerline": {
+          "x1": 2,
+          "z1": 10,
+          "x2": 28,
+          "z2": 10
+        },
+        "widthM": 3,
+        "lanes": [
+          {
+            "id": "a6l1",
+            "code": "A06-L",
+            "side": "LEFT",
+            "rackTypeId": "rt1",
+            "startOffsetM": 0,
+            "lengthM": 21.6,
+            "levels": [
+              {
+                "clearHeightM": 1.2,
+                "binDepthM": 1.5,
+                "beamHeightM": 0.08,
+                "maxWeightKg": 750
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "expected": {
+    "publishable": true,
+    "binCount": 8,
+    "bayCount": 8,
+    "diagnosticCodes": [
+      "LEVEL_DEPTH_EXCEEDS_RACK"
+    ],
+    "diagnostics": [
+      {
+        "severity": "warning",
+        "code": "LEVEL_DEPTH_EXCEEDS_RACK",
+        "entityRefs": [
+          {
+            "kind": "lane",
+            "id": "a6l1",
+            "label": "A06-L"
+          },
+          {
+            "kind": "level",
+            "id": "a6l1:0",
+            "label": "L1"
+          }
+        ]
+      }
+    ],
+    "docHash": "e06d9d7109c4f74698d67a05b6bfb77f33020fc2e734b3946e0c45ee3e9aa030",
+    "firstBinCode": "WH1/A06/L/B001/L1",
+    "lastBinCode": "WH1/A06/L/B008/L1"
+  }
+}

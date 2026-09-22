@@ -1,0 +1,2051 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Warehouse Designer API",
+    "description": "Authoritative layout compiler and persistence for the 3D warehouse designer. The TypeScript compiler in packages/layout-core is the interactive mirror of the compiler used here; both are pinned by fixtures/layout-conformance.",
+    "version": "0.0.0"
+  },
+  "paths": {
+    "/health": {
+      "get": {
+        "summary": "Health",
+        "operationId": "health_health_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "type": "object",
+                  "title": "Response Health Health Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/health/db": {
+      "get": {
+        "summary": "Health Db",
+        "operationId": "health_db_health_db_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "type": "object",
+                  "title": "Response Health Db Health Db Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/layout/validate": {
+      "post": {
+        "summary": "Validate Layout",
+        "description": "Run the rules without writing anything. Used by the editor's diagnostics panel.",
+        "operationId": "validate_layout_api_layout_validate_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LayoutPayload"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CompileResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/layout/compile": {
+      "post": {
+        "summary": "Compile Layout",
+        "description": "Compile and return the derived bins, checking the client hash if supplied.",
+        "operationId": "compile_layout_api_layout_compile_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LayoutPayload"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CompileResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/warehouses": {
+      "get": {
+        "tags": [
+          "warehouses"
+        ],
+        "summary": "List Warehouses",
+        "operationId": "list_warehouses_api_warehouses_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/WarehouseOut"
+                  },
+                  "type": "array",
+                  "title": "Response List Warehouses Api Warehouses Get"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "warehouses"
+        ],
+        "summary": "Create Warehouse",
+        "description": "Create a warehouse, optionally seeding it with a document.\n\nWhen ``doc`` is supplied it wins outright \u2014 including its own footprint \u2014 because\nthe document is the source of truth and a payload whose footprint disagreed with\nits document would otherwise create two conflicting records.",
+        "operationId": "create_warehouse_api_warehouses_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WarehouseCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WarehouseOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/warehouses/{warehouse_id}": {
+      "get": {
+        "tags": [
+          "warehouses"
+        ],
+        "summary": "Get Warehouse Detail",
+        "operationId": "get_warehouse_detail_api_warehouses__warehouse_id__get",
+        "parameters": [
+          {
+            "name": "warehouse_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Warehouse Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WarehouseOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/warehouses/{warehouse_id}/draft": {
+      "put": {
+        "tags": [
+          "warehouses"
+        ],
+        "summary": "Put Draft",
+        "description": "Autosave. Debounced by the client; guarded by the revision token here.",
+        "operationId": "put_draft_api_warehouses__warehouse_id__draft_put",
+        "parameters": [
+          {
+            "name": "warehouse_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Warehouse Id"
+            }
+          },
+          {
+            "name": "If-Match",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "If-Match"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DraftPut"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DraftOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "warehouses"
+        ],
+        "summary": "Discard Draft",
+        "description": "Throw the draft away, keeping any published version intact.\n\nA discard bumps the revision too: a client that still holds the old token must\nfind out that its working copy is no longer the server's.",
+        "operationId": "discard_draft_api_warehouses__warehouse_id__draft_delete",
+        "parameters": [
+          {
+            "name": "warehouse_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Warehouse Id"
+            }
+          },
+          {
+            "name": "If-Match",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "If-Match"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/warehouses/{warehouse_id}/validate": {
+      "post": {
+        "tags": [
+          "warehouses"
+        ],
+        "summary": "Validate Warehouse Layout",
+        "description": "Compile without writing. The editor's pre-flight for a save or a publish.",
+        "operationId": "validate_warehouse_layout_api_warehouses__warehouse_id__validate_post",
+        "parameters": [
+          {
+            "name": "warehouse_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Warehouse Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PublishRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true,
+                  "title": "Response Validate Warehouse Layout Api Warehouses  Warehouse Id  Validate Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/warehouses/{warehouse_id}/publish": {
+      "post": {
+        "tags": [
+          "warehouses"
+        ],
+        "summary": "Publish Warehouse Layout",
+        "description": "Validate, materialise and publish in one transaction.\n\nIdempotent on ``doc_hash``: publishing the document that is already live returns\nthe existing version with ``changed: false``.",
+        "operationId": "publish_warehouse_layout_api_warehouses__warehouse_id__publish_post",
+        "parameters": [
+          {
+            "name": "warehouse_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Warehouse Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PublishRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublishOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/warehouses/{warehouse_id}/versions": {
+      "get": {
+        "tags": [
+          "warehouses"
+        ],
+        "summary": "List Versions",
+        "operationId": "list_versions_api_warehouses__warehouse_id__versions_get",
+        "parameters": [
+          {
+            "name": "warehouse_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Warehouse Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/VersionOut"
+                  },
+                  "title": "Response List Versions Api Warehouses  Warehouse Id  Versions Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/warehouses/{warehouse_id}/layout": {
+      "get": {
+        "tags": [
+          "warehouses"
+        ],
+        "summary": "Get Published Layout",
+        "description": "The published layout for Operate mode.\n\nBins are read from the materialised rows rather than recompiled, because those\nrows carry the surrogate ids that placements reference. The document is also\nrecompiled and its hash returned alongside, so a snapshot that no longer matches\nwhat the compiler would produce today is visible as ``conflicts`` instead of\nbeing silently served.",
+        "operationId": "get_published_layout_api_warehouses__warehouse_id__layout_get",
+        "parameters": [
+          {
+            "name": "warehouse_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Warehouse Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublishedLayoutOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/warehouses/{warehouse_id}/skus": {
+      "get": {
+        "tags": [
+          "inventory"
+        ],
+        "summary": "List Skus",
+        "operationId": "list_skus_api_warehouses__warehouse_id__skus_get",
+        "parameters": [
+          {
+            "name": "warehouse_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Warehouse Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SkuOut"
+                  },
+                  "title": "Response List Skus Api Warehouses  Warehouse Id  Skus Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "inventory"
+        ],
+        "summary": "Create Sku",
+        "operationId": "create_sku_api_warehouses__warehouse_id__skus_post",
+        "parameters": [
+          {
+            "name": "warehouse_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Warehouse Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SkuIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SkuOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/skus/{sku_id}": {
+      "put": {
+        "tags": [
+          "inventory"
+        ],
+        "summary": "Update Sku",
+        "description": "Edit a SKU in place.\n\nThis does **not** re-validate existing placements. Shrinking a SKU cannot invalidate\nanything, but growing one can, and silently deleting inventory because a dimension\nchanged would be worse than leaving a placement that a later check flags. The\nplacement list reports each bin's utilisation, so an over-capacity bin is visible.",
+        "operationId": "update_sku_api_skus__sku_id__put",
+        "parameters": [
+          {
+            "name": "sku_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Sku Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SkuIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SkuOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "inventory"
+        ],
+        "summary": "Delete Sku",
+        "operationId": "delete_sku_api_skus__sku_id__delete",
+        "parameters": [
+          {
+            "name": "sku_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Sku Id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/warehouses/{warehouse_id}/placements": {
+      "get": {
+        "tags": [
+          "inventory"
+        ],
+        "summary": "List Warehouse Placements",
+        "operationId": "list_warehouse_placements_api_warehouses__warehouse_id__placements_get",
+        "parameters": [
+          {
+            "name": "warehouse_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Warehouse Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PlacementOut"
+                  },
+                  "title": "Response List Warehouse Placements Api Warehouses  Warehouse Id  Placements Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/warehouses/{warehouse_id}/utilization": {
+      "get": {
+        "tags": [
+          "inventory"
+        ],
+        "summary": "Get Utilization",
+        "operationId": "get_utilization_api_warehouses__warehouse_id__utilization_get",
+        "parameters": [
+          {
+            "name": "warehouse_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Warehouse Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UtilizationOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/bins/{bin_id}/placements": {
+      "get": {
+        "tags": [
+          "inventory"
+        ],
+        "summary": "Get Bin Placements",
+        "operationId": "get_bin_placements_api_bins__bin_id__placements_get",
+        "parameters": [
+          {
+            "name": "bin_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Bin Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BinPlacementsOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "inventory"
+        ],
+        "summary": "Create Placement",
+        "description": "Place a SKU in a bin, revalidating on the server.\n\nThe client checks the same thing before the drop, so a 200 here means both sides\nagreed and a 422 means the codes should match what the client computed.",
+        "operationId": "create_placement_api_bins__bin_id__placements_post",
+        "parameters": [
+          {
+            "name": "bin_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Bin Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PlacementIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlacementOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/placements/{placement_id}": {
+      "delete": {
+        "tags": [
+          "inventory"
+        ],
+        "summary": "Delete Placement",
+        "operationId": "delete_placement_api_placements__placement_id__delete",
+        "parameters": [
+          {
+            "name": "placement_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Placement Id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/warehouses/{warehouse_id}/placements/bulk": {
+      "post": {
+        "tags": [
+          "inventory"
+        ],
+        "summary": "Bulk Create Placements",
+        "description": "Fill many bins at once, with a verdict per bin rather than all-or-nothing.",
+        "operationId": "bulk_create_placements_api_warehouses__warehouse_id__placements_bulk_post",
+        "parameters": [
+          {
+            "name": "warehouse_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Warehouse Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BulkPlacementIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BulkPlacementOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "BinPlacementsOut": {
+        "properties": {
+          "binId": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Binid"
+          },
+          "binCode": {
+            "type": "string",
+            "title": "Bincode"
+          },
+          "capacityM3": {
+            "type": "number",
+            "title": "Capacitym3"
+          },
+          "maxWeightKg": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Maxweightkg"
+          },
+          "usedVolumeM3": {
+            "type": "number",
+            "title": "Usedvolumem3"
+          },
+          "usedWeightKg": {
+            "type": "number",
+            "title": "Usedweightkg"
+          },
+          "remainingVolumeM3": {
+            "type": "number",
+            "title": "Remainingvolumem3"
+          },
+          "remainingWeightKg": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Remainingweightkg"
+          },
+          "utilization": {
+            "type": "number",
+            "title": "Utilization"
+          },
+          "placements": {
+            "items": {
+              "$ref": "#/components/schemas/PlacementOut"
+            },
+            "type": "array",
+            "title": "Placements"
+          }
+        },
+        "type": "object",
+        "required": [
+          "binId",
+          "binCode",
+          "capacityM3",
+          "maxWeightKg",
+          "usedVolumeM3",
+          "usedWeightKg",
+          "remainingVolumeM3",
+          "remainingWeightKg",
+          "utilization",
+          "placements"
+        ],
+        "title": "BinPlacementsOut",
+        "description": "A bin and everything in it, with the capacity arithmetic already done.\n\n`remaining*` is computed from the *other* placements, so the client can render a\ndrag ghost from the same numbers the server checks rather than re-deriving them."
+      },
+      "BulkPlacementIn": {
+        "properties": {
+          "skuId": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Skuid"
+          },
+          "qty": {
+            "type": "integer",
+            "exclusiveMinimum": 0.0,
+            "title": "Qty"
+          },
+          "binIds": {
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "type": "array",
+            "minItems": 1,
+            "title": "Binids"
+          }
+        },
+        "type": "object",
+        "required": [
+          "skuId",
+          "qty",
+          "binIds"
+        ],
+        "title": "BulkPlacementIn"
+      },
+      "BulkPlacementItem": {
+        "properties": {
+          "binId": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Binid"
+          },
+          "binCode": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Bincode"
+          },
+          "ok": {
+            "type": "boolean",
+            "title": "Ok"
+          },
+          "code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Code"
+          },
+          "message": {
+            "type": "string",
+            "title": "Message",
+            "default": ""
+          },
+          "placement": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PlacementOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "binId",
+          "ok"
+        ],
+        "title": "BulkPlacementItem"
+      },
+      "BulkPlacementOut": {
+        "properties": {
+          "placed": {
+            "type": "integer",
+            "title": "Placed"
+          },
+          "rejected": {
+            "type": "integer",
+            "title": "Rejected"
+          },
+          "results": {
+            "items": {
+              "$ref": "#/components/schemas/BulkPlacementItem"
+            },
+            "type": "array",
+            "title": "Results"
+          }
+        },
+        "type": "object",
+        "required": [
+          "placed",
+          "rejected",
+          "results"
+        ],
+        "title": "BulkPlacementOut",
+        "description": "Every bin gets its own verdict: a bulk fill is per-bin, not all-or-nothing."
+      },
+      "CompileResponse": {
+        "properties": {
+          "docHash": {
+            "type": "string",
+            "title": "Dochash"
+          },
+          "publishable": {
+            "type": "boolean",
+            "title": "Publishable"
+          },
+          "binCount": {
+            "type": "integer",
+            "title": "Bincount"
+          },
+          "bayCount": {
+            "type": "integer",
+            "title": "Baycount"
+          },
+          "errorCount": {
+            "type": "integer",
+            "title": "Errorcount"
+          },
+          "warningCount": {
+            "type": "integer",
+            "title": "Warningcount"
+          },
+          "diagnostics": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "type": "array",
+            "title": "Diagnostics"
+          },
+          "bins": {
+            "anyOf": [
+              {
+                "items": {
+                  "additionalProperties": true,
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Bins"
+          }
+        },
+        "type": "object",
+        "required": [
+          "docHash",
+          "publishable",
+          "binCount",
+          "bayCount",
+          "errorCount",
+          "warningCount",
+          "diagnostics"
+        ],
+        "title": "CompileResponse"
+      },
+      "DraftOut": {
+        "properties": {
+          "warehouseId": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Warehouseid"
+          },
+          "version": {
+            "type": "integer",
+            "title": "Version"
+          },
+          "draftRevision": {
+            "type": "integer",
+            "title": "Draftrevision"
+          },
+          "docHash": {
+            "type": "string",
+            "title": "Dochash"
+          },
+          "publishable": {
+            "type": "boolean",
+            "title": "Publishable"
+          },
+          "errorCount": {
+            "type": "integer",
+            "title": "Errorcount"
+          },
+          "warningCount": {
+            "type": "integer",
+            "title": "Warningcount"
+          },
+          "diagnostics": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "type": "array",
+            "title": "Diagnostics"
+          },
+          "savedAt": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Savedat"
+          }
+        },
+        "type": "object",
+        "required": [
+          "warehouseId",
+          "version",
+          "draftRevision",
+          "docHash",
+          "publishable",
+          "errorCount",
+          "warningCount",
+          "diagnostics",
+          "savedAt"
+        ],
+        "title": "DraftOut"
+      },
+      "DraftPut": {
+        "properties": {
+          "doc": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Doc"
+          },
+          "clientDocHash": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Clientdochash"
+          }
+        },
+        "type": "object",
+        "required": [
+          "doc"
+        ],
+        "title": "DraftPut"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "LayoutPayload": {
+        "properties": {
+          "doc": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Doc"
+          },
+          "clientDocHash": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Clientdochash"
+          }
+        },
+        "type": "object",
+        "required": [
+          "doc"
+        ],
+        "title": "LayoutPayload"
+      },
+      "PlacementIn": {
+        "properties": {
+          "skuId": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Skuid"
+          },
+          "qty": {
+            "type": "integer",
+            "exclusiveMinimum": 0.0,
+            "title": "Qty"
+          }
+        },
+        "type": "object",
+        "required": [
+          "skuId",
+          "qty"
+        ],
+        "title": "PlacementIn"
+      },
+      "PlacementOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "binId": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Binid"
+          },
+          "binCode": {
+            "type": "string",
+            "title": "Bincode"
+          },
+          "skuId": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Skuid"
+          },
+          "sku": {
+            "type": "string",
+            "title": "Sku"
+          },
+          "qty": {
+            "type": "integer",
+            "title": "Qty"
+          },
+          "volumeUsedM3": {
+            "type": "number",
+            "title": "Volumeusedm3"
+          },
+          "weightUsedKg": {
+            "type": "number",
+            "title": "Weightusedkg"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "binId",
+          "binCode",
+          "skuId",
+          "sku",
+          "qty",
+          "volumeUsedM3",
+          "weightUsedKg"
+        ],
+        "title": "PlacementOut"
+      },
+      "PublishOut": {
+        "properties": {
+          "warehouseId": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Warehouseid"
+          },
+          "version": {
+            "type": "integer",
+            "title": "Version"
+          },
+          "docHash": {
+            "type": "string",
+            "title": "Dochash"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "changed": {
+            "type": "boolean",
+            "title": "Changed"
+          },
+          "binCount": {
+            "type": "integer",
+            "title": "Bincount"
+          },
+          "bayCount": {
+            "type": "integer",
+            "title": "Baycount"
+          },
+          "errorCount": {
+            "type": "integer",
+            "title": "Errorcount"
+          },
+          "warningCount": {
+            "type": "integer",
+            "title": "Warningcount"
+          },
+          "diagnostics": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "type": "array",
+            "title": "Diagnostics"
+          },
+          "orphanedPlacements": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "type": "array",
+            "title": "Orphanedplacements"
+          }
+        },
+        "type": "object",
+        "required": [
+          "warehouseId",
+          "version",
+          "docHash",
+          "status",
+          "changed",
+          "binCount",
+          "bayCount",
+          "errorCount",
+          "warningCount",
+          "diagnostics",
+          "orphanedPlacements"
+        ],
+        "title": "PublishOut"
+      },
+      "PublishRequest": {
+        "properties": {
+          "doc": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Doc"
+          },
+          "clientDocHash": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Clientdochash"
+          },
+          "createdBy": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Createdby"
+          }
+        },
+        "type": "object",
+        "required": [
+          "doc"
+        ],
+        "title": "PublishRequest"
+      },
+      "PublishedLayoutOut": {
+        "properties": {
+          "warehouseId": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Warehouseid"
+          },
+          "code": {
+            "type": "string",
+            "title": "Code"
+          },
+          "version": {
+            "type": "integer",
+            "title": "Version"
+          },
+          "docHash": {
+            "type": "string",
+            "title": "Dochash"
+          },
+          "recompiledDocHash": {
+            "type": "string",
+            "title": "Recompileddochash"
+          },
+          "publishedAt": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Publishedat"
+          },
+          "bins": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "type": "array",
+            "title": "Bins"
+          },
+          "conflicts": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Conflicts"
+          }
+        },
+        "type": "object",
+        "required": [
+          "warehouseId",
+          "code",
+          "version",
+          "docHash",
+          "recompiledDocHash",
+          "publishedAt",
+          "bins"
+        ],
+        "title": "PublishedLayoutOut",
+        "description": "What Operate mode reads.\n\nBins come from the materialised rows rather than from a fresh compile, because\nthose rows carry the surrogate ids that placements reference. ``docHash`` and\n``recompiledDocHash`` are both returned so drift between the snapshot and the\ncurrent compiler is visible instead of assumed away."
+      },
+      "SkuIn": {
+        "properties": {
+          "sku": {
+            "type": "string",
+            "maxLength": 64,
+            "minLength": 1,
+            "title": "Sku"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name",
+            "default": ""
+          },
+          "widthM": {
+            "type": "number",
+            "exclusiveMinimum": 0.0,
+            "title": "Widthm"
+          },
+          "heightM": {
+            "type": "number",
+            "exclusiveMinimum": 0.0,
+            "title": "Heightm"
+          },
+          "depthM": {
+            "type": "number",
+            "exclusiveMinimum": 0.0,
+            "title": "Depthm"
+          },
+          "weightKg": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Weightkg"
+          },
+          "stackable": {
+            "type": "boolean",
+            "title": "Stackable",
+            "default": true
+          },
+          "rotatable": {
+            "type": "boolean",
+            "title": "Rotatable",
+            "default": true
+          },
+          "hazmat": {
+            "type": "boolean",
+            "title": "Hazmat",
+            "default": false
+          }
+        },
+        "type": "object",
+        "required": [
+          "sku",
+          "widthM",
+          "heightM",
+          "depthM",
+          "weightKg"
+        ],
+        "title": "SkuIn"
+      },
+      "SkuOut": {
+        "properties": {
+          "sku": {
+            "type": "string",
+            "maxLength": 64,
+            "minLength": 1,
+            "title": "Sku"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name",
+            "default": ""
+          },
+          "widthM": {
+            "type": "number",
+            "exclusiveMinimum": 0.0,
+            "title": "Widthm"
+          },
+          "heightM": {
+            "type": "number",
+            "exclusiveMinimum": 0.0,
+            "title": "Heightm"
+          },
+          "depthM": {
+            "type": "number",
+            "exclusiveMinimum": 0.0,
+            "title": "Depthm"
+          },
+          "weightKg": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Weightkg"
+          },
+          "stackable": {
+            "type": "boolean",
+            "title": "Stackable",
+            "default": true
+          },
+          "rotatable": {
+            "type": "boolean",
+            "title": "Rotatable",
+            "default": true
+          },
+          "hazmat": {
+            "type": "boolean",
+            "title": "Hazmat",
+            "default": false
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "placedQty": {
+            "type": "integer",
+            "title": "Placedqty",
+            "default": 0
+          }
+        },
+        "type": "object",
+        "required": [
+          "sku",
+          "widthM",
+          "heightM",
+          "depthM",
+          "weightKg",
+          "id"
+        ],
+        "title": "SkuOut"
+      },
+      "UtilizationOut": {
+        "properties": {
+          "warehouseId": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Warehouseid"
+          },
+          "binCount": {
+            "type": "integer",
+            "title": "Bincount"
+          },
+          "utilizedBins": {
+            "type": "integer",
+            "title": "Utilizedbins"
+          },
+          "emptyBins": {
+            "type": "integer",
+            "title": "Emptybins"
+          },
+          "entries": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "type": "array",
+            "title": "Entries"
+          }
+        },
+        "type": "object",
+        "required": [
+          "warehouseId",
+          "binCount",
+          "utilizedBins",
+          "emptyBins",
+          "entries"
+        ],
+        "title": "UtilizationOut",
+        "description": "Heatmap input: utilisation per bin, and the bins that hold nothing."
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "ctx": {
+            "type": "object",
+            "title": "Context"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      },
+      "VersionOut": {
+        "properties": {
+          "version": {
+            "type": "integer",
+            "title": "Version"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "docHash": {
+            "type": "string",
+            "title": "Dochash"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Createdat"
+          },
+          "publishedAt": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Publishedat"
+          },
+          "createdBy": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Createdby"
+          },
+          "errorCount": {
+            "type": "integer",
+            "title": "Errorcount",
+            "default": 0
+          },
+          "warningCount": {
+            "type": "integer",
+            "title": "Warningcount",
+            "default": 0
+          },
+          "orphanedPlacements": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "type": "array",
+            "title": "Orphanedplacements"
+          }
+        },
+        "type": "object",
+        "required": [
+          "version",
+          "status",
+          "docHash",
+          "createdAt"
+        ],
+        "title": "VersionOut"
+      },
+      "WarehouseCreate": {
+        "properties": {
+          "code": {
+            "type": "string",
+            "maxLength": 64,
+            "minLength": 1,
+            "title": "Code"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name",
+            "default": ""
+          },
+          "lengthM": {
+            "type": "number",
+            "exclusiveMinimum": 0.0,
+            "title": "Lengthm"
+          },
+          "widthM": {
+            "type": "number",
+            "exclusiveMinimum": 0.0,
+            "title": "Widthm"
+          },
+          "heightM": {
+            "type": "number",
+            "exclusiveMinimum": 0.0,
+            "title": "Heightm"
+          },
+          "origin": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "type": "number"
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Origin"
+          },
+          "doc": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Doc"
+          }
+        },
+        "type": "object",
+        "required": [
+          "code",
+          "lengthM",
+          "widthM",
+          "heightM"
+        ],
+        "title": "WarehouseCreate",
+        "description": "A warehouse starts from a footprint, with an optional first document.\n\nSupplying ``doc`` lets the client seed a new warehouse from the layout it already\nhas open instead of round-tripping a blank one through a draft save."
+      },
+      "WarehouseOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "code": {
+            "type": "string",
+            "title": "Code"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "lengthM": {
+            "type": "number",
+            "title": "Lengthm"
+          },
+          "widthM": {
+            "type": "number",
+            "title": "Widthm"
+          },
+          "heightM": {
+            "type": "number",
+            "title": "Heightm"
+          },
+          "draftRevision": {
+            "type": "integer",
+            "title": "Draftrevision"
+          },
+          "draft": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/VersionOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "published": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/VersionOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "code",
+          "name",
+          "lengthM",
+          "widthM",
+          "heightM",
+          "draftRevision"
+        ],
+        "title": "WarehouseOut"
+      }
+    }
+  }
+}

@@ -1,0 +1,125 @@
+{
+  "$comment": "GENERATED FILE — do not edit by hand. Source: packages/layout-core/src/rules.ts. Regenerate with `npm run gen:schema`.",
+  "rules": [
+    {
+      "code": "AISLE_CODE_DUPLICATE",
+      "severity": "error",
+      "description": "Two aisles share a code, which breaks bin-code uniqueness."
+    },
+    {
+      "code": "AISLE_NOT_AXIS_ALIGNED",
+      "severity": "error",
+      "description": "Aisle runs diagonally; v1 supports only exactly X or Z aligned aisles."
+    },
+    {
+      "code": "AISLE_OBSTACLE_OVERLAP",
+      "severity": "error",
+      "description": "The clear corridor passes through a column, wall or other obstacle."
+    },
+    {
+      "code": "AISLE_ORIENTATION_MISMATCH",
+      "severity": "error",
+      "description": "Declared orientation contradicts the centerline direction."
+    },
+    {
+      "code": "AISLE_OUT_OF_FOOTPRINT",
+      "severity": "error",
+      "description": "The clear corridor extends beyond the warehouse footprint."
+    },
+    {
+      "code": "AISLE_TOO_NARROW",
+      "severity": "warning",
+      "description": "Corridor is narrower than a counterbalance forklift realistically needs."
+    },
+    {
+      "code": "AISLE_WITHOUT_LANES",
+      "severity": "warning",
+      "description": "Aisle has no rack rows, so it stores nothing."
+    },
+    {
+      "code": "AISLE_ZERO_LENGTH",
+      "severity": "error",
+      "description": "Aisle centerline start and end coincide."
+    },
+    {
+      "code": "BAY_OBSTACLE_OVERLAP",
+      "severity": "error",
+      "description": "A bay collides with a column, wall or other obstacle."
+    },
+    {
+      "code": "BIN_CODE_DUPLICATE",
+      "severity": "error",
+      "description": "Two bins resolve to the same code; the bin code pattern is not unique enough."
+    },
+    {
+      "code": "BIN_OUT_OF_FOOTPRINT",
+      "severity": "error",
+      "description": "A bay extends beyond the warehouse footprint."
+    },
+    {
+      "code": "DIAGNOSTICS_TRUNCATED",
+      "severity": "warning",
+      "description": "Further instances of a repeated issue were suppressed to avoid flooding."
+    },
+    {
+      "code": "EXCEEDS_BIN_VOLUME",
+      "severity": "error",
+      "description": "The placed quantity exceeds the bin usable volume."
+    },
+    {
+      "code": "EXCEEDS_BIN_WEIGHT",
+      "severity": "error",
+      "description": "The placed quantity exceeds the level beam load limit."
+    },
+    {
+      "code": "ITEM_DOES_NOT_FIT_OPENING",
+      "severity": "error",
+      "description": "The item does not fit the bin opening in any legal orientation."
+    },
+    {
+      "code": "LANE_HAS_NO_RACK_SEGMENT",
+      "severity": "warning",
+      "description": "Every segment of a lane is a GAP, so it yields no bins."
+    },
+    {
+      "code": "LANE_OVERLAP",
+      "severity": "error",
+      "description": "Two lanes occupy the same floor space, which usually means aisles are too close."
+    },
+    {
+      "code": "LANE_RUN_EXCEEDS_AISLE",
+      "severity": "error",
+      "description": "A lane run starts or ends beyond the aisle centerline."
+    },
+    {
+      "code": "LANE_UNKNOWN_RACK_TYPE",
+      "severity": "error",
+      "description": "A lane references a rackTypeId that is not in the document."
+    },
+    {
+      "code": "LANE_ZERO_BAYS",
+      "severity": "warning",
+      "description": "A lane is shorter than one bay, so it yields no bins."
+    },
+    {
+      "code": "LEVEL_DEPTH_EXCEEDS_RACK",
+      "severity": "warning",
+      "description": "A level is configured deeper than the structural rack frame."
+    },
+    {
+      "code": "LEVEL_STACK_EXCEEDS_HEIGHT",
+      "severity": "error",
+      "description": "The level stack (beams plus clear heights) is taller than the building."
+    },
+    {
+      "code": "NO_RACK_TYPES_DEFINED",
+      "severity": "error",
+      "description": "Aisles have lanes but the document defines no rack types."
+    },
+    {
+      "code": "QTY_NOT_POSITIVE",
+      "severity": "error",
+      "description": "Placement quantity must be greater than zero."
+    }
+  ]
+}

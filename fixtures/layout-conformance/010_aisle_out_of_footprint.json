@@ -1,0 +1,77 @@
+{
+  "name": "010_aisle_out_of_footprint",
+  "description": "The aisle sits close enough to the wall that its clear corridor pokes outside the footprint, while the RIGHT lane's bays stay inside. Isolates the corridor check from the per-bay check.",
+  "targets": [
+    "AISLE_OUT_OF_FOOTPRINT"
+  ],
+  "doc": {
+    "schemaVersion": 1,
+    "warehouse": {
+      "code": "WH1",
+      "lengthM": 40,
+      "widthM": 20,
+      "heightM": 8
+    },
+    "rackTypes": [
+      {
+        "id": "rt1",
+        "code": "STD",
+        "bayWidthM": 2.7,
+        "depthM": 1.1
+      }
+    ],
+    "aisles": [
+      {
+        "id": "a10",
+        "code": "A10",
+        "orientation": "X",
+        "centerline": {
+          "x1": 2,
+          "z1": 1,
+          "x2": 38,
+          "z2": 1
+        },
+        "widthM": 3,
+        "lanes": [
+          {
+            "id": "a10l1",
+            "code": "A10-R",
+            "side": "RIGHT",
+            "rackTypeId": "rt1",
+            "lengthM": 27,
+            "levels": [
+              {
+                "clearHeightM": 1.6,
+                "binDepthM": 1
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "expected": {
+    "publishable": false,
+    "binCount": 10,
+    "bayCount": 10,
+    "diagnosticCodes": [
+      "AISLE_OUT_OF_FOOTPRINT"
+    ],
+    "diagnostics": [
+      {
+        "severity": "error",
+        "code": "AISLE_OUT_OF_FOOTPRINT",
+        "entityRefs": [
+          {
+            "kind": "aisle",
+            "id": "a10",
+            "label": "A10"
+          }
+        ]
+      }
+    ],
+    "docHash": "739f6c1ed0d91e65c9eaf12b9d137f05217ffc24f29d32ba3c3cc0ba5a05765e",
+    "firstBinCode": "WH1/A10/R/B001/L1",
+    "lastBinCode": "WH1/A10/R/B010/L1"
+  }
+}

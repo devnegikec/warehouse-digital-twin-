@@ -1,0 +1,83 @@
+{
+  "name": "007_no_rack_types",
+  "description": "Lanes exist but the document declares no rack types, and the referenced rack type is missing. Both are hard errors and no geometry can be derived.",
+  "targets": [
+    "NO_RACK_TYPES_DEFINED",
+    "LANE_UNKNOWN_RACK_TYPE"
+  ],
+  "doc": {
+    "schemaVersion": 1,
+    "warehouse": {
+      "code": "WH1",
+      "lengthM": 40,
+      "widthM": 20,
+      "heightM": 8
+    },
+    "rackTypes": [],
+    "aisles": [
+      {
+        "id": "a7",
+        "code": "A07",
+        "orientation": "X",
+        "centerline": {
+          "x1": 2,
+          "z1": 10,
+          "x2": 38,
+          "z2": 10
+        },
+        "widthM": 3,
+        "lanes": [
+          {
+            "id": "a7l1",
+            "code": "A07-L",
+            "side": "LEFT",
+            "rackTypeId": "missing",
+            "lengthM": 27,
+            "levels": [
+              {
+                "clearHeightM": 1.6,
+                "binDepthM": 1
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "expected": {
+    "publishable": false,
+    "binCount": 0,
+    "bayCount": 0,
+    "diagnosticCodes": [
+      "LANE_UNKNOWN_RACK_TYPE",
+      "NO_RACK_TYPES_DEFINED"
+    ],
+    "diagnostics": [
+      {
+        "severity": "error",
+        "code": "NO_RACK_TYPES_DEFINED",
+        "entityRefs": [
+          {
+            "kind": "warehouse",
+            "id": "WH1",
+            "label": "WH1"
+          }
+        ]
+      },
+      {
+        "severity": "error",
+        "code": "LANE_UNKNOWN_RACK_TYPE",
+        "entityRefs": [
+          {
+            "kind": "lane",
+            "id": "a7l1",
+            "label": "A07-L"
+          }
+        ]
+      }
+    ],
+    "docHash": "9c7958a1bd0a349a8a6433fab7b26db0c40f455f81bc251c65c9a7a5dea16235",
+    "firstBinCode": null,
+    "lastBinCode": null
+  }
+}

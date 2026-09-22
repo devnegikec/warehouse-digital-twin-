@@ -1,0 +1,78 @@
+{
+  "name": "001_single_aisle_left",
+  "description": "Baseline: one aisle, a single LEFT lane, three levels. Exercises the default bin code pattern and the omitted-segments default.",
+  "doc": {
+    "schemaVersion": 1,
+    "warehouse": {
+      "code": "WH1",
+      "name": "Fixture Warehouse",
+      "lengthM": 40,
+      "widthM": 20,
+      "heightM": 8
+    },
+    "obstacles": [],
+    "rackTypes": [
+      {
+        "id": "rt1",
+        "code": "STD",
+        "name": "Standard pallet rack",
+        "bayWidthM": 2.7,
+        "depthM": 1.1,
+        "uprightWidthM": 0.12,
+        "uprightDepthM": 0.12
+      }
+    ],
+    "aisles": [
+      {
+        "id": "a1",
+        "code": "A01",
+        "orientation": "X",
+        "centerline": {
+          "x1": 2,
+          "z1": 10,
+          "x2": 38,
+          "z2": 10
+        },
+        "widthM": 3,
+        "travelDirection": "BOTH",
+        "lanes": [
+          {
+            "id": "a1l1",
+            "code": "A01-L",
+            "side": "LEFT",
+            "rackTypeId": "rt1",
+            "startOffsetM": 0,
+            "lengthM": 27,
+            "levels": [
+              {
+                "clearHeightM": 1.6,
+                "binDepthM": 1,
+                "beamHeightM": 0.08
+              },
+              {
+                "clearHeightM": 1.6,
+                "binDepthM": 1,
+                "beamHeightM": 0.08
+              },
+              {
+                "clearHeightM": 1.6,
+                "binDepthM": 1,
+                "beamHeightM": 0.08
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "expected": {
+    "publishable": true,
+    "binCount": 30,
+    "bayCount": 10,
+    "diagnosticCodes": [],
+    "diagnostics": [],
+    "docHash": "c8606580c545774ff48f889a091def252b2b9bc8152510030884f5dfab5bec03",
+    "firstBinCode": "WH1/A01/L/B001/L1",
+    "lastBinCode": "WH1/A01/L/B010/L3"
+  }
+}

@@ -1,0 +1,119 @@
+{
+  "name": "004_bay_obstacle_overlap",
+  "description": "A structural column sits inside the rack run. The corridor itself is clear, so this must be caught by the bay-level obstacle check. Expected to be unpublishable.",
+  "doc": {
+    "schemaVersion": 1,
+    "warehouse": {
+      "code": "WH1",
+      "name": "Fixture Warehouse",
+      "lengthM": 30,
+      "widthM": 20,
+      "heightM": 8
+    },
+    "obstacles": [
+      {
+        "id": "ob1",
+        "kind": "COLUMN",
+        "x": 12,
+        "z": 7.4,
+        "widthM": 1,
+        "depthM": 1,
+        "heightM": 3
+      }
+    ],
+    "rackTypes": [
+      {
+        "id": "rt1",
+        "code": "STD",
+        "name": "Standard pallet rack",
+        "bayWidthM": 2.7,
+        "depthM": 1.1,
+        "uprightWidthM": 0.12,
+        "uprightDepthM": 0.12
+      }
+    ],
+    "aisles": [
+      {
+        "id": "a4",
+        "code": "A04",
+        "orientation": "X",
+        "centerline": {
+          "x1": 2,
+          "z1": 10,
+          "x2": 28,
+          "z2": 10
+        },
+        "widthM": 3,
+        "travelDirection": "BOTH",
+        "lanes": [
+          {
+            "id": "a4l1",
+            "code": "A04-L",
+            "side": "LEFT",
+            "rackTypeId": "rt1",
+            "startOffsetM": 0,
+            "lengthM": 24.3,
+            "levels": [
+              {
+                "clearHeightM": 1.6,
+                "binDepthM": 1,
+                "beamHeightM": 0.08
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "expected": {
+    "publishable": false,
+    "binCount": 9,
+    "bayCount": 9,
+    "diagnosticCodes": [
+      "BAY_OBSTACLE_OVERLAP"
+    ],
+    "diagnostics": [
+      {
+        "severity": "error",
+        "code": "BAY_OBSTACLE_OVERLAP",
+        "entityRefs": [
+          {
+            "kind": "lane",
+            "id": "a4l1",
+            "label": "A04-L"
+          },
+          {
+            "kind": "obstacle",
+            "id": "ob1",
+            "label": "COLUMN"
+          }
+        ],
+        "data": {
+          "baySeq": 4
+        }
+      },
+      {
+        "severity": "error",
+        "code": "BAY_OBSTACLE_OVERLAP",
+        "entityRefs": [
+          {
+            "kind": "lane",
+            "id": "a4l1",
+            "label": "A04-L"
+          },
+          {
+            "kind": "obstacle",
+            "id": "ob1",
+            "label": "COLUMN"
+          }
+        ],
+        "data": {
+          "baySeq": 5
+        }
+      }
+    ],
+    "docHash": "7ff603980e6f743604bcf503fed65a0dd09d2ef942c219e59ff6d073e0a02464",
+    "firstBinCode": "WH1/A04/L/B001/L1",
+    "lastBinCode": "WH1/A04/L/B009/L1"
+  }
+}

@@ -1,0 +1,81 @@
+{
+  "name": "009_orientation_mismatch",
+  "description": "The aisle declares orientation Z but its centerline runs along X. The centerline wins, so geometry is still derived and the layout is merely unpublishable.",
+  "targets": [
+    "AISLE_ORIENTATION_MISMATCH"
+  ],
+  "doc": {
+    "schemaVersion": 1,
+    "warehouse": {
+      "code": "WH1",
+      "lengthM": 40,
+      "widthM": 20,
+      "heightM": 8
+    },
+    "rackTypes": [
+      {
+        "id": "rt1",
+        "code": "STD",
+        "bayWidthM": 2.7,
+        "depthM": 1.1
+      }
+    ],
+    "aisles": [
+      {
+        "id": "a9",
+        "code": "A09",
+        "orientation": "Z",
+        "centerline": {
+          "x1": 2,
+          "z1": 10,
+          "x2": 38,
+          "z2": 10
+        },
+        "widthM": 3,
+        "lanes": [
+          {
+            "id": "a9l1",
+            "code": "A09-L",
+            "side": "LEFT",
+            "rackTypeId": "rt1",
+            "lengthM": 27,
+            "levels": [
+              {
+                "clearHeightM": 1.6,
+                "binDepthM": 1
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "expected": {
+    "publishable": false,
+    "binCount": 10,
+    "bayCount": 10,
+    "diagnosticCodes": [
+      "AISLE_ORIENTATION_MISMATCH"
+    ],
+    "diagnostics": [
+      {
+        "severity": "error",
+        "code": "AISLE_ORIENTATION_MISMATCH",
+        "entityRefs": [
+          {
+            "kind": "aisle",
+            "id": "a9",
+            "label": "A09"
+          }
+        ],
+        "data": {
+          "declared": "Z",
+          "derived": "X"
+        }
+      }
+    ],
+    "docHash": "c019d5a1a8b8aa845d3ce80676811e4660e8f7fc40868fea9e0ed7f26899adc1",
+    "firstBinCode": "WH1/A09/L/B001/L1",
+    "lastBinCode": "WH1/A09/L/B010/L1"
+  }
+}

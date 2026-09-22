@@ -1,0 +1,389 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://warehouse-3d.local/schema/layout-doc.v1.json",
+  "title": "LayoutDoc v1",
+  "$comment": "GENERATED FILE — do not edit by hand. Source: packages/layout-core/src/schema.ts. Regenerate with `npm run gen:schema`.",
+  "type": "object",
+  "properties": {
+    "schemaVersion": {
+      "type": "number",
+      "const": 1
+    },
+    "warehouse": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "code": {
+          "type": "string",
+          "minLength": 1
+        },
+        "name": {
+          "default": "",
+          "type": "string"
+        },
+        "lengthM": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "widthM": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "heightM": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "origin": {
+          "default": {
+            "x": 0,
+            "z": 0
+          },
+          "type": "object",
+          "properties": {
+            "x": {
+              "default": 0,
+              "type": "number"
+            },
+            "z": {
+              "default": 0,
+              "type": "number"
+            }
+          }
+        },
+        "metadata": {
+          "default": {},
+          "type": "object",
+          "propertyNames": {
+            "type": "string"
+          },
+          "additionalProperties": {}
+        }
+      },
+      "required": [
+        "code",
+        "lengthM",
+        "widthM",
+        "heightM"
+      ]
+    },
+    "obstacles": {
+      "default": [],
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "kind": {
+            "default": "CUSTOM",
+            "type": "string",
+            "enum": [
+              "COLUMN",
+              "PILLAR",
+              "WALL",
+              "OFFICE",
+              "CUSTOM"
+            ]
+          },
+          "x": {
+            "type": "number"
+          },
+          "z": {
+            "type": "number"
+          },
+          "widthM": {
+            "type": "number",
+            "exclusiveMinimum": 0
+          },
+          "depthM": {
+            "type": "number",
+            "exclusiveMinimum": 0
+          },
+          "heightM": {
+            "type": "number",
+            "exclusiveMinimum": 0
+          },
+          "metadata": {
+            "default": {},
+            "type": "object",
+            "propertyNames": {
+              "type": "string"
+            },
+            "additionalProperties": {}
+          }
+        },
+        "required": [
+          "id",
+          "x",
+          "z",
+          "widthM",
+          "depthM",
+          "heightM"
+        ]
+      }
+    },
+    "rackTypes": {
+      "default": [],
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "code": {
+            "type": "string",
+            "minLength": 1
+          },
+          "name": {
+            "default": "",
+            "type": "string"
+          },
+          "bayWidthM": {
+            "type": "number",
+            "exclusiveMinimum": 0
+          },
+          "depthM": {
+            "type": "number",
+            "exclusiveMinimum": 0
+          },
+          "uprightWidthM": {
+            "default": 0.12,
+            "type": "number",
+            "exclusiveMinimum": 0
+          },
+          "uprightDepthM": {
+            "default": 0.12,
+            "type": "number",
+            "exclusiveMinimum": 0
+          },
+          "metadata": {
+            "default": {},
+            "type": "object",
+            "propertyNames": {
+              "type": "string"
+            },
+            "additionalProperties": {}
+          }
+        },
+        "required": [
+          "id",
+          "code",
+          "bayWidthM",
+          "depthM"
+        ]
+      }
+    },
+    "aisles": {
+      "default": [],
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "code": {
+            "type": "string",
+            "minLength": 1
+          },
+          "orientation": {
+            "type": "string",
+            "enum": [
+              "X",
+              "Z"
+            ]
+          },
+          "centerline": {
+            "type": "object",
+            "properties": {
+              "x1": {
+                "type": "number"
+              },
+              "z1": {
+                "type": "number"
+              },
+              "x2": {
+                "type": "number"
+              },
+              "z2": {
+                "type": "number"
+              }
+            },
+            "required": [
+              "x1",
+              "z1",
+              "x2",
+              "z2"
+            ]
+          },
+          "widthM": {
+            "type": "number",
+            "exclusiveMinimum": 0
+          },
+          "travelDirection": {
+            "default": "BOTH",
+            "type": "string",
+            "enum": [
+              "BOTH",
+              "FORWARD",
+              "REVERSE"
+            ]
+          },
+          "lanes": {
+            "default": [],
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "code": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "side": {
+                  "type": "string",
+                  "enum": [
+                    "LEFT",
+                    "RIGHT"
+                  ]
+                },
+                "rackTypeId": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "startOffsetM": {
+                  "default": 0,
+                  "type": "number",
+                  "minimum": 0
+                },
+                "lengthM": {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                },
+                "levels": {
+                  "minItems": 1,
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "clearHeightM": {
+                        "type": "number",
+                        "exclusiveMinimum": 0
+                      },
+                      "binDepthM": {
+                        "type": "number",
+                        "exclusiveMinimum": 0
+                      },
+                      "beamHeightM": {
+                        "default": 0.08,
+                        "type": "number",
+                        "minimum": 0
+                      },
+                      "maxWeightKg": {
+                        "type": "number",
+                        "exclusiveMinimum": 0
+                      }
+                    },
+                    "required": [
+                      "clearHeightM",
+                      "binDepthM"
+                    ]
+                  }
+                },
+                "segments": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "kind": {
+                        "type": "string",
+                        "enum": [
+                          "RACK",
+                          "GAP"
+                        ]
+                      },
+                      "startM": {
+                        "type": "number",
+                        "minimum": 0
+                      },
+                      "endM": {
+                        "type": "number",
+                        "exclusiveMinimum": 0
+                      },
+                      "label": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "kind",
+                      "startM",
+                      "endM"
+                    ]
+                  }
+                },
+                "skipBays": {
+                  "default": [],
+                  "type": "array",
+                  "items": {
+                    "type": "integer",
+                    "exclusiveMinimum": 0,
+                    "maximum": 9007199254740991
+                  }
+                },
+                "binCodePattern": {
+                  "default": "{warehouse}/{aisle}/{side}/B{bay:03}/L{level}",
+                  "type": "string"
+                },
+                "metadata": {
+                  "default": {},
+                  "type": "object",
+                  "propertyNames": {
+                    "type": "string"
+                  },
+                  "additionalProperties": {}
+                }
+              },
+              "required": [
+                "id",
+                "code",
+                "side",
+                "rackTypeId",
+                "lengthM",
+                "levels"
+              ]
+            }
+          },
+          "metadata": {
+            "default": {},
+            "type": "object",
+            "propertyNames": {
+              "type": "string"
+            },
+            "additionalProperties": {}
+          }
+        },
+        "required": [
+          "id",
+          "code",
+          "orientation",
+          "centerline",
+          "widthM"
+        ]
+      }
+    }
+  },
+  "required": [
+    "schemaVersion",
+    "warehouse"
+  ]
+}
