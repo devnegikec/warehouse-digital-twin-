@@ -240,7 +240,14 @@ export function BinsInstanced() {
         }}
       >
         <boxGeometry args={[1, 1, 1]} />
-        <meshStandardMaterial vertexColors roughness={0.7} metalness={0.15} />
+        {/*
+          * No `vertexColors` here. It makes three define `USE_COLOR`, which reads the
+          * geometry's `color` attribute — and a boxGeometry has none, so WebGL feeds
+          * the shader the default generic attribute (0, 0, 0) and every bin renders
+          * black. Per-instance colours only need `USE_INSTANCING_COLOR`, which three
+          * enables by itself once `setColorAt` has created the instance colour buffer.
+          */}
+        <meshStandardMaterial roughness={0.7} metalness={0.15} />
       </instancedMesh>
 
       {/*

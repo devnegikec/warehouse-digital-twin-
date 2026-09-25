@@ -20,7 +20,7 @@ import { enablePatches, produceWithPatches, type Draft, type Patch } from 'immer
 import { ZodError } from 'zod';
 
 import { normalizeDoc } from './compile.js';
-import { EPS } from './units.js';
+import { EPS, clamp, round } from './units.js';
 import {
   AisleSchema,
   LaneSchema,
@@ -127,6 +127,14 @@ export type Command =
   | { type: 'aisle.update'; aisleId: string; patch: Partial<Omit<AisleInput, 'id' | 'lanes'>> }
   | { type: 'aisle.translate'; aisleId: string; deltaX: number; deltaZ: number }
   | { type: 'aisle.remove'; aisleId: string }
+  /**
+   * Cut a cross-aisle — a walking route across the racking — through every lane of
+   * the named aisles, at `positionRatio` along each aisle's own centreline.
+   *
+   * One command rather than a `lane.setSegments` per lane so the whole route is a
+   * single undo step, and so all lanes are cut from one intent instead of N.
+   */
+  | { type: 'crossAisle.add'; aisleIds: string[]; positionRatio: number; widthM: number }
   | { type: 'lane.add'; aisleId: string; lane: LaneInput }
   | { type: 'lane.update'; laneId: string; patch: Partial<Omit<LaneInput, 'id' | 'levels' | 'segments'>> }
   | { type: 'lane.remove'; laneId: string }
@@ -152,6 +160,7 @@ export const COMMAND_LABELS: Record<CommandType, string> = {
   'aisle.update': 'Edit aisle',
   'aisle.translate': 'Move aisle',
   'aisle.remove': 'Delete aisle',
+  'crossAisle.add': 'Add cross-aisle',
   'lane.add': 'Add lane',
   'lane.update': 'Edit lane',
   'lane.remove': 'Delete lane',
@@ -339,6 +348,87 @@ function clampSegments(segments: LaneSegment[], laneLengthM: number): LaneSegmen
     .map((segment) => LaneSegmentSchema.parse(segment));
 }
 
+/** Length of an aisle's centreline, in metres. */
+export function aisleLengthOf(centerline: Centerline): number {
+  return Math.hypot(centerline.x2 - centerline.x1, centerline.z2 - centerline.z1);
+}
+
+/** Join touching runs of the same kind, so repeated cuts do not shred the run list. */
+function mergeRuns(segments: LaneSegment[]): LaneSegment[] {
+  const merged: LaneSegment[] = [];
+  for (const segment of segments) {
+    const last = merged.at(-1);
+    if (last && last.kind === segment.kind && last.endM >= segment.startM - EPS) {
+      merged[merged.length - 1] = { ...last, endM: Math.max(last.endM, segment.endM) };
+      continue;
+    }
+    merged.push(segment);
+  }
+  return merged;
+}
+
+/**
+ * Cut a cross-aisle gap out of a lane's runs.
+ *
+ * The gap is snapped to whole bays and centred on the bay containing
+ * `positionAlongAisleM`, because the compiler only omits a bay when the gap covers
+ * the bay's *centre*. A gap typed in by hand that lands between two centres is a
+ * corridor in the document and nothing at all in the racks.
+ *
+ * Returns `null` when the lane cannot take the cut: it does not reach that position,
+ * it is too short to keep any racking, or a gap is already there. The caller can then
+ * tell "no change" from "changed".
+ */
+export function crossAisleSegments(
+  lane: Pick<Lane, 'lengthM' | 'startOffsetM' | 'segments'>,
+  bayWidthM: number,
+  positionAlongAisleM: number,
+  widthM: number,
+): LaneSegment[] | null {
+  const laneLength = lane.lengthM;
+  const local = positionAlongAisleM - lane.startOffsetM;
+  if (local < 0 || local > laneLength) return null;
+
+  const bayCount = Math.floor((laneLength + EPS) / bayWidthM);
+  // At least two bays: as a divider the cross-aisle must leave racking on both sides.
+  if (bayCount < 2) return null;
+
+  const bayIndex = clamp(Math.floor(local / bayWidthM), 0, bayCount - 1);
+  const gapBays = Math.min(Math.max(1, Math.round(widthM / bayWidthM)), bayCount - 1);
+  const centre = (bayIndex + 0.5) * bayWidthM;
+  const half = (gapBays * bayWidthM) / 2;
+  const gapStart = round(Math.max(0, centre - half), 3);
+  const gapEnd = round(Math.min(laneLength, centre + half), 3);
+
+  const existing = lane.segments ?? defaultLaneSegments(laneLength);
+  const rackRuns = existing.filter(
+    (segment) =>
+      segment.kind === 'RACK' && segment.endM > gapStart + EPS && segment.startM < gapEnd - EPS,
+  );
+  // Already a hole here — cutting again would not remove a single extra bay.
+  if (rackRuns.length === 0) return null;
+
+  const next: LaneSegment[] = [];
+  for (const segment of existing) {
+    const overlaps = segment.endM > gapStart + EPS && segment.startM < gapEnd - EPS;
+    if (segment.kind !== 'RACK' || !overlaps) {
+      next.push(segment);
+      continue;
+    }
+    if (segment.startM < gapStart - EPS) next.push({ ...segment, endM: gapStart });
+    if (segment.endM > gapEnd + EPS) next.push({ ...segment, startM: gapEnd });
+  }
+  for (const segment of rackRuns) {
+    next.push({
+      kind: 'GAP',
+      startM: round(Math.max(segment.startM, gapStart), 3),
+      endM: round(Math.min(segment.endM, gapEnd), 3),
+    });
+  }
+
+  return mergeRuns(next.sort((a, b) => a.startM - b.startM));
+}
+
 // --- Recipes -----------------------------------------------------------------
 
 type Recipe<C extends Command> = (
@@ -405,6 +495,46 @@ const RECIPES: RecipeMap = {
     const index = draft.aisles.findIndex((candidate) => candidate.id === command.aisleId);
     if (index < 0) abort(`No aisle with id '${command.aisleId}'`);
     draft.aisles.splice(index, 1);
+  },
+
+  'crossAisle.add': (draft, command) => {
+    if (command.aisleIds.length === 0) abort('crossAisle.add needs at least one aisle');
+    if (!(command.positionRatio >= 0 && command.positionRatio <= 1)) {
+      abort(`crossAisle.add positionRatio must be between 0 and 1; received ${command.positionRatio}`);
+    }
+    if (!(command.widthM > 0)) {
+      abort(`crossAisle.add widthM must be positive; received ${command.widthM}`);
+    }
+
+    const rackTypeById = new Map(draft.rackTypes.map((rackType) => [rackType.id, rackType]));
+    let cut = 0;
+
+    for (const aisleId of command.aisleIds) {
+      const aisle = findAisle(draft, aisleId, 'crossAisle.add');
+      const positionAlongAisleM = aisleLengthOf(aisle.centerline) * command.positionRatio;
+
+      for (const lane of aisle.lanes) {
+        const rackType = rackTypeById.get(lane.rackTypeId);
+        // A lane with no rack type is already broken; the validator says so and
+        // there is nothing here to cut.
+        if (!rackType) continue;
+
+        const segments = crossAisleSegments(
+          lane,
+          rackType.bayWidthM,
+          positionAlongAisleM,
+          command.widthM,
+        );
+        if (!segments) continue;
+
+        lane.segments = normaliseSegments(segments, lane.lengthM, lane.code);
+        cut += 1;
+      }
+    }
+
+    // A no-op edit would still push a history entry, and undoing "nothing" is the
+    // most confusing thing an editor can do.
+    if (cut === 0) abort('No lane reaches that position, so the cross-aisle would change nothing');
   },
 
   'lane.add': (draft, command, ctx) => {

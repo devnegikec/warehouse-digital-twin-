@@ -144,7 +144,7 @@ Target: **100k+ bins**. Render via `THREE.InstancedMesh` (you already do), rebui
 - grid snapping (default 0.05 m) + axis constraint (hold `Shift`)
 - live dimension readout while dragging
 - an **authoritative numeric inspector** — typing an exact value always wins
-- optional top-down orthographic mini-map for sanity checks
+- a top-down orthographic **plan view**, as a mini-map for sanity checks and, since Phase 10, as a full editing tab (`plan/PlanEditor.tsx`) — because perspective hides whether two racks share a centreline, and a cross-aisle is far easier to place where you can see the bays.
 
 ### P13 — Optimistic, debounced persistence
 Autosave draft (`PATCH`, debounced ~1 s) + explicit **Publish**. Concurrency via integer `version` with optimistic locking (`409` on stale write).
@@ -1197,6 +1197,36 @@ Notable fixtures: `014_lane_overlap` (aisles placed 1 m apart — invisible to a
 **DoD met, end to end.** *A layout designed in Design mode renders identically in Operate mode; the picking route still works.*
 
 `src/operate/operate.integration.test.ts` publishes a real layout to a real server, loads it back the way an operator would, and compares the two projections slot by slot: **360 bins, same positions, sizes, rotations, capacities, aisle/lane codes, bays and levels.** Alongside it, `slots.test.ts` proves the projection is lossless for any bin list, and `PickingRoute.test.ts` proves the route walks the *corridor* between the two rack faces rather than along one of them.
+
+### Phase 10 — Cross-aisles and the editable plan · COMPLETE
+
+§1 row 5 always listed cross-aisle gaps as a first-class gap kind, and `LaneSegment` could already express one — but only *per lane*, typed in by hand. A route that divides the building therefore meant repeating the same arithmetic on every lane, and getting the bay alignment right each time.
+
+| Deliverable | Evidence |
+|---|---|
+| `crossAisle.add`, one command for the whole route | `layout-core/src/commands.ts`. Names the aisles, a `positionRatio` (0.5 = middle) and a `widthM`; it cuts **every lane of every named aisle** in one `produceWithPatches` pass, so the racks, the diagnostics and the undo stack all move together. |
+| Gaps snapped to whole bays | `crossAisleSegments()`. The compiler omits a bay only when a gap covers the bay's **centre**, so the cut is centred on the bay containing the requested position and widened to whole bays. A hand-typed gap between two centres is a corridor in the document and nothing at all in the racks. |
+| One click per aisle | `StructurePanel` — a ⤬ button on each aisle row, defaulting to `max(bayWidth, MIN_AISLE_WIDTH_M)` so the route is never narrower than a forklift needs. |
+| The plan is now editable | `plan/PlanEditor.tsx`, reached through a **3D / Plan (2D)** tab in the toolbar. Select, drag an aisle or a column to move it, place an aisle, and cut a cross-aisle where you click (across one aisle or all of them). |
+| One document, two views | Both tabs dispatch the same commands and draw the same derived geometry, so which tab is open cannot change the layout. Newly placed aisles go through `design/placement.ts`, shared by the 3D canvas and the plan. |
+| Shared plan geometry | `plan/planGeometry.ts` — `corridorRect`, `aisleAt`, `ratioAlongAisle`. The mini-map now imports the same `corridorRect` it used to own, so the two plans cannot be mirrored relative to each other. |
+
+**DoD met, both ways.** `packages/layout-core/src/__tests__/commands.test.ts` covers the bay snap, multi-aisle/multi-lane cuts, the single-undo property, and the three refusals (no lane reaches the position, the gap is already there, out-of-range ratio/width/aisle). `e2e/design.spec.ts` drives the real button and requires `1 edit`, a 10-bin drop for one aisle, and a full restore on **one** undo.
+
+#### Bugs found while building this
+
+| Bug | Cause | Fix |
+|---|---|---|
+| **Every bin rendered black** | `<meshStandardMaterial vertexColors>` on a `boxGeometry`. That makes three define `USE_COLOR`, which reads the geometry's `color` attribute — and a box has none, so WebGL feeds the shader the default generic attribute `(0,0,0)` and `vColor.rgb *= color` zeroes every instance colour. Per-instance colours need only `USE_INSTANCING_COLOR`, which three enables by itself once `setColorAt` has run. | Drop `vertexColors`; the capacity ramp and the utilisation heatmap come from the instance buffer. Operate mode was never affected because its material never asked for vertex colours. |
+| Clicking an aisle did nothing in cross-aisle mode | Tool clicks were handled on the floor rectangle, but a rectangle only receives events that land on it — a click on an aisle never reached the floor. | Handle tool clicks on the `<svg>` itself, and have the child shapes `stopPropagation` when they claim a click in SELECT mode. |
+| Run tooltips read "6 bays × 5 levels = 55 bins" | The bay count was per *run* while the bin count was per *lane*, so the two numbers described different things. | Report both, labelled: this run's bays and bins, plus the lane total. |
+
+#### Design decisions worth recording
+
+- **A cross-aisle is a command, not a UI loop over `lane.setSegments`.** Three aisles × two lanes would otherwise be six history entries, and undo would take six presses to walk back one intent. It also lets the command reject a route that would change nothing, so a click that lands off the racking cannot push an empty edit onto the stack.
+- **The bay is the unit, not the metre.** Snapping inside the command (rather than in the UI) means the inspector, the structure tree, the plan and any future caller all get the same alignment, and the safety property lives in the one place the tests cover.
+- **The plan is a second *view*, not a second store.** It reads `graph` and writes commands exactly like the 3D canvas. Anything else would give the editor two ways to be right.
+
 
 The chain has no untested link: compiled bins → published rows (`server/tests/test_persistence.py`, field by field) → operate slots (`operate.integration.test.ts`).
 

@@ -139,6 +139,12 @@ export function sampleCommands(): Record<CommandType, Command> {
     'aisle.update': command({ type: 'aisle.update', aisleId: 'a1', patch: { widthM: 3.5 } }),
     'aisle.translate': command({ type: 'aisle.translate', aisleId: 'a1', deltaX: 1, deltaZ: -1 }),
     'aisle.remove': command({ type: 'aisle.remove', aisleId: 'a1' }),
+    'crossAisle.add': command({
+      type: 'crossAisle.add',
+      aisleIds: ['a1'],
+      positionRatio: 0.5,
+      widthM: 2.7,
+    }),
     'lane.add': command({ type: 'lane.add', aisleId: 'a1', lane: laneInput({ side: 'RIGHT' }) }),
     'lane.update': command({ type: 'lane.update', laneId: 'l1', patch: { lengthM: 21.6 } }),
     'lane.remove': command({ type: 'lane.remove', laneId: 'l1' }),

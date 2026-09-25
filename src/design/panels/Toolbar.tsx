@@ -11,9 +11,15 @@ import { useDesignStore } from '../store/designStore';
 import { COLORS, SNAP_OPTIONS } from '../theme';
 import { SessionBar } from './SessionBar';
 
-type Props = { onSwitchMode: () => void; onPublish: () => void };
+type Props = {
+  onSwitchMode: () => void;
+  onPublish: () => void;
+  /** Which view of the document the canvas area is showing. */
+  view: '3D' | 'PLAN';
+  onViewChange: (view: '3D' | 'PLAN') => void;
+};
 
-export function Toolbar({ onSwitchMode, onPublish }: Props) {
+export function Toolbar({ onSwitchMode, onPublish, view, onViewChange }: Props) {
   const undo = useDesignStore((state) => state.undo);
   const redo = useDesignStore((state) => state.redo);
   const tool = useDesignStore((state) => state.tool);
@@ -69,6 +75,27 @@ export function Toolbar({ onSwitchMode, onPublish }: Props) {
         <span className="status-item" style={{ fontSize: 11, color: COLORS.textFaint }}>
           {depth} edit{depth === 1 ? '' : 's'}
         </span>
+      </div>
+
+      <div className="topbar-group">
+        <div className="view-tabs" role="tablist" aria-label="View">
+          <button
+            role="tab"
+            aria-selected={view === '3D'}
+            className={`view-tab${view === '3D' ? ' view-tab-active' : ''}`}
+            onClick={() => onViewChange('3D')}
+          >
+            3D
+          </button>
+          <button
+            role="tab"
+            aria-selected={view === 'PLAN'}
+            className={`view-tab${view === 'PLAN' ? ' view-tab-active' : ''}`}
+            onClick={() => onViewChange('PLAN')}
+          >
+            Plan (2D)
+          </button>
+        </div>
       </div>
 
       <div className="topbar-group">

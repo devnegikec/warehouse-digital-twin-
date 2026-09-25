@@ -90,8 +90,39 @@ test.describe('Design mode', () => {
     await expect(page.locator('.topbar-group .status-item')).toHaveText('0 edits');
   });
 
-  test('Escape discards a typed value instead of committing it', async ({ page }) => {
+  test('a cross-aisle cuts every lane in one edit, and one undo takes it back', async ({
+    page,
+  }) => {
     await openDesign(page);
+    const before = await counts(page);
+
+    // The route is authored from the structure tree, like every other structural edit, so
+    // this exercises the command rather than a canvas raycast.
+    await page
+      .getByTitle('Cut a cross-aisle through every lane of this aisle, at the middle')
+      .first()
+      .click();
+
+    // One aisle's two lanes lose one bay each, at five levels. One command, so one
+    // history entry — and undo has to take the whole route back in one step.
+    await expect(page.locator('.topbar-group .status-item')).toHaveText('1 edit');
+    await expect
+      .poll(async () => (await counts(page)).bins, { message: 'the route should remove bins' })
+      .toBe(before.bins - 10);
+
+    // Bays are still counted — a gap removes bay *binning*, not the bay itself.
+    expect((await counts(page)).bays).toBe(before.bays);
+    await expect(page.locator('.status .badge')).toHaveText('Publishable');
+
+    await page.getByRole('button', { name: '↶' }).click();
+
+    await expect
+      .poll(async () => (await counts(page)).bins, { message: 'undo should restore the racking' })
+      .toBe(before.bins);
+    await expect(page.locator('.topbar-group .status-item')).toHaveText('0 edits');
+  });
+
+  test('Escape discards a typed value instead of committing it', async ({ page }) => {    await openDesign(page);
     const before = await counts(page);
 
     await page.locator('.tree-row .tree-pick[title^="Lane "]').first().click();

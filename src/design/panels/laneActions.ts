@@ -11,7 +11,14 @@
  */
 import { useCallback } from 'react';
 
-import { round, type Aisle, type LaneSide, type ObstacleKind } from 'layout-core';
+import {
+  MIN_AISLE_WIDTH_M,
+  round,
+  type Aisle,
+  type LaneSide,
+  type ObstacleKind,
+  type RackType,
+} from 'layout-core';
 
 import { useDesignStore } from '../store/designStore';
 
@@ -66,8 +73,48 @@ export function useAddLane(): (aisle: Aisle, side: LaneSide) => void {
   );
 }
 
-export function useAddObstacle(): (kind: ObstacleKind) => void {
+/**
+ * Width a cross-aisle should be by default: at least one bay, so it removes whole
+ * bays, and never narrower than a forklift needs.
+ */
+export function defaultCrossAisleWidthM(aisle: Aisle, rackTypes: readonly RackType[]): number {
+  const byId = new Map(rackTypes.map((rackType) => [rackType.id, rackType]));
+  const bayWidthM = aisle.lanes
+    .map((lane) => byId.get(lane.rackTypeId)?.bayWidthM)
+    .find((width): width is number => typeof width === 'number');
+
+  return Math.max(bayWidthM ?? MIN_AISLE_WIDTH_M, MIN_AISLE_WIDTH_M);
+}
+
+/**
+ * Cut a cross-aisle through every lane of `aisleIds`, at `positionRatio` along each
+ * aisle (0.5 is the middle).
+ *
+ * One command for the whole route, so the racks on both sides, the diagnostics and the
+ * undo stack all move together.
+ */
+export function useAddCrossAisle(): (
+  aisleIds: string[],
+  positionRatio: number,
+  widthM: number,
+) => boolean {
   const dispatch = useDesignStore((state) => state.dispatch);
+
+  return useCallback(
+    (aisleIds, positionRatio, widthM) => {
+      if (aisleIds.length === 0) return false;
+      return dispatch({
+        type: 'crossAisle.add',
+        aisleIds,
+        positionRatio: round(positionRatio, 4),
+        widthM: round(widthM, 3),
+      }).ok;
+    },
+    [dispatch],
+  );
+}
+
+export function useAddObstacle(): (kind: ObstacleKind) => void {  const dispatch = useDesignStore((state) => state.dispatch);
   const select = useDesignStore((state) => state.select);
   const warehouse = useDesignStore((state) => state.history.doc.warehouse);
   const obstacles = useDesignStore((state) => state.history.doc.obstacles);

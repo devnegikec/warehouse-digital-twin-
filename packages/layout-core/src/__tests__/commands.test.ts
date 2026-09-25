@@ -396,3 +396,112 @@ describe('document.update and document.replace', () => {
     expect(result.reason).toMatch(/Invalid document\.replace/);
   });
 });
+
+describe('crossAisle.add', () => {
+  /** `richDoc`'s aisle is 36 m long; its lane is 27 m = 10 bays of 2.7 m. */
+  const cut = (doc = richDoc(), overrides: Record<string, unknown> = {}) =>
+    applyCommand(
+      doc,
+      command({
+        type: 'crossAisle.add',
+        aisleIds: ['a1'],
+        positionRatio: 0.5,
+        widthM: 2.7,
+        ...overrides,
+      } as Parameters<typeof command>[0]),
+      testContext,
+    );
+
+  it('cuts one whole bay out of the lane and removes its bins', () => {
+    const before = buildLayout(richDoc()).bins.length;
+    const result = cut();
+
+    expect(result.ok).toBe(true);
+    expect(result.doc.aisles[0]?.lanes[0]?.segments).toEqual([
+      { kind: 'RACK', startM: 0, endM: 16.2 },
+      { kind: 'GAP', startM: 16.2, endM: 18.9 },
+      { kind: 'RACK', startM: 18.9, endM: 27 },
+    ]);
+
+    // Bay 7 is centred at 17.55 m, inside the gap; two levels go with it.
+    const after = buildLayout(result.doc).bins.length;
+    expect(after).toBe(before - 2);
+  });
+
+  it('snaps the gap onto a bay centre, not onto the requested metre', () => {
+    // 0.5 x 36 m = 18 m, which sits between the centres at 17.55 and 20.25.
+    const result = cut();
+    const gap = result.doc.aisles[0]?.lanes[0]?.segments?.find((s) => s.kind === 'GAP');
+
+    expect(gap?.startM).toBe(16.2);
+    expect(gap?.endM).toBe(18.9);
+  });
+
+  it('widens to whole bays when asked for a multi-bay route', () => {
+    const result = cut(richDoc(), { widthM: 5.4 });
+    const gap = result.doc.aisles[0]?.lanes[0]?.segments?.find((s) => s.kind === 'GAP');
+
+    // Two bays wide, centred on the same bay.
+    expect(gap?.startM).toBe(14.85);
+    expect(gap?.endM).toBe(20.25);
+  });
+
+  it('cuts every lane of every named aisle in one command', () => {
+    const twoAisles = applyCommand(
+      richDoc(),
+      command({
+        type: 'aisle.add',
+        aisle: aisleInput({
+          id: 'a2',
+          code: 'A02',
+          centerline: { x1: 2, z1: 16, x2: 38, z2: 16 },
+          lanes: [
+            laneInput({ id: 'l2', code: 'A02-L1', side: 'LEFT' }),
+            laneInput({ id: 'l3', code: 'A02-L2', side: 'RIGHT' }),
+          ],
+        }),
+      }),
+      testContext,
+    ).doc;
+
+    const result = cut(twoAisles, { aisleIds: ['a1', 'a2'] });
+
+    expect(result.ok).toBe(true);
+    for (const aisle of result.doc.aisles) {
+      expect(aisle.lanes).toHaveLength(aisle.code === 'A01' ? 1 : 2);
+      for (const lane of aisle.lanes) {
+        expect(lane.segments?.some((s) => s.kind === 'GAP')).toBe(true);
+      }
+    }
+  });
+
+  it('is a single undo step', () => {
+    const result = cut();
+    const reversed = applyPatches(result.doc, result.inversePatches);
+
+    expect(buildLayout(reversed).bins.length).toBe(buildLayout(richDoc()).bins.length);
+    expect(reversed.aisles[0]?.lanes[0]?.segments).toEqual([{ kind: 'RACK', startM: 0, endM: 27 }]);
+  });
+
+  it('refuses when no lane reaches the position', () => {
+    // The lane runs 27 m from offset 0, so the aisle's far end is past its racking.
+    const result = cut(richDoc(), { positionRatio: 1 });
+
+    expect(result.ok).toBe(false);
+    expect(result.reason).toMatch(/reaches that position/);
+  });
+
+  it('refuses to cut a gap that is already there', () => {
+    const once = cut().doc;
+    const again = cut(once);
+
+    expect(again.ok).toBe(false);
+    expect(again.reason).toMatch(/change nothing/);
+  });
+
+  it('rejects an out-of-range ratio, a non-positive width and an unknown aisle', () => {
+    expect(cut(richDoc(), { positionRatio: 1.5 }).reason).toMatch(/between 0 and 1/);
+    expect(cut(richDoc(), { widthM: 0 }).reason).toMatch(/must be positive/);
+    expect(cut(richDoc(), { aisleIds: ['nope'] }).reason).toMatch(/No aisle with id/);
+  });
+});

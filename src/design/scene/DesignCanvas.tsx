@@ -10,6 +10,7 @@ import { OrbitControls } from '@react-three/drei';
 
 import { snap } from 'layout-core';
 
+import { makeAisleInput } from '../placement';
 import { designState, useDesignStore } from '../store/designStore';
 import { COLORS } from '../theme';
 import { AisleGizmos } from './AisleGizmos';
@@ -18,14 +19,6 @@ import { CameraRig } from './CameraRig';
 import { ObstacleMeshes } from './ObstacleMeshes';
 import { FootprintOutline, WarehouseFloor } from './WarehouseFloor';
 import { useClickNotDrag } from './useClickNotDrag';
-
-const NEW_AISLE_WIDTH_M = 3.4;
-const NEW_AISLE_BAY_WIDTH_M = 2.7;
-const NEW_AISLE_LEVEL = { clearHeightM: 1.4, binDepthM: 1.0, beamHeightM: 0.08 };
-
-function clamp(value: number, low: number, high: number): number {
-  return Math.min(Math.max(value, low), high);
-}
 
 /** Invisible floor plane that captures clicks which miss every object. */
 function GroundInteraction() {
@@ -45,30 +38,9 @@ function GroundInteraction() {
     const rackType = rackTypes[0];
     if (!rackType) return;
 
-    const bays = Math.max(1, Math.floor((lengthM - 4) / NEW_AISLE_BAY_WIDTH_M));
-    const runLength = bays * NEW_AISLE_BAY_WIDTH_M;
-    const x1 = clamp(
-      point.x - runLength / 2,
-      origin.x + 1,
-      Math.max(origin.x + 1, origin.x + lengthM - runLength - 1),
-    );
-    const z = clamp(point.z, origin.z + 2, Math.max(origin.z + 2, origin.z + widthM - 2));
-
     const outcome = dispatch({
       type: 'aisle.add',
-      aisle: {
-        orientation: 'X',
-        centerline: { x1, z1: z, x2: x1 + runLength, z2: z },
-        widthM: NEW_AISLE_WIDTH_M,
-        lanes: [
-          {
-            side: 'LEFT',
-            rackTypeId: rackType.id,
-            lengthM: runLength,
-            levels: [NEW_AISLE_LEVEL],
-          },
-        ],
-      },
+      aisle: makeAisleInput(point, warehouse, rackType.id),
     });
 
     if (!outcome.ok) return;

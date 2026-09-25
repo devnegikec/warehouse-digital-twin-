@@ -13,7 +13,7 @@
 import type { Aisle, Lane, LayoutDoc } from 'layout-core';
 
 import { useDesignStore } from '../store/designStore';
-import { useAddLane, useAddObstacle } from './laneActions';
+import { defaultCrossAisleWidthM, useAddCrossAisle, useAddLane, useAddObstacle } from './laneActions';
 import { laneStatsOf, useLaneStats, type LaneStats } from './laneStats';
 
 function TreeRow({
@@ -80,7 +80,9 @@ function AisleBlock({ aisle }: { aisle: Aisle }) {
   const selection = useDesignStore((state) => state.selection);
   const dispatch = useDesignStore((state) => state.dispatch);
   const select = useDesignStore((state) => state.select);
+  const rackTypes = useDesignStore((state) => state.history.doc.rackTypes);
   const addLane = useAddLane();
+  const addCrossAisle = useAddCrossAisle();
   const stats = useLaneStats();
 
   const selected = selection.some((ref) => ref.kind === 'aisle' && ref.id === aisle.id);
@@ -111,6 +113,16 @@ function AisleBlock({ aisle }: { aisle: Aisle }) {
           onClick={() => addLane(aisle, 'RIGHT')}
         >
           +R
+        </button>
+        <button
+          className="icon-button icon-button-text"
+          title="Cut a cross-aisle through every lane of this aisle, at the middle"
+          disabled={aisle.lanes.length === 0}
+          onClick={() =>
+            addCrossAisle([aisle.id], 0.5, defaultCrossAisleWidthM(aisle, rackTypes))
+          }
+        >
+          ⤬
         </button>
         <button
           className="icon-button"

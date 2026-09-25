@@ -14,25 +14,10 @@
  */
 import { useMemo, useState } from 'react';
 
-import type { Aisle } from 'layout-core';
-
 import { useDesignStore } from '../store/designStore';
+import { corridorRect } from '../plan/planGeometry';
 import { rackRuns } from '../scene/rackRuns';
 import { COLORS } from '../theme';
-
-type Rect = { x: number; z: number; width: number; height: number };
-
-/** Corridor footprint of an aisle, in plan coordinates. */
-function corridorRect(aisle: Aisle): Rect {
-  const { x1, z1, x2, z2 } = aisle.centerline;
-  const half = aisle.widthM / 2;
-  const alongX = Math.abs(x2 - x1) >= Math.abs(z2 - z1);
-
-  if (alongX) {
-    return { x: Math.min(x1, x2), z: z1 - half, width: Math.abs(x2 - x1), height: aisle.widthM };
-  }
-  return { x: x1 - half, z: Math.min(z1, z2), width: aisle.widthM, height: Math.abs(z2 - z1) };
-}
 
 export function MiniMap() {
   const warehouse = useDesignStore((state) => state.history.doc.warehouse);
