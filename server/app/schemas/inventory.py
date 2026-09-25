@@ -8,6 +8,7 @@ assert it by comparing two strings rather than by pattern-matching prose.
 
 from __future__ import annotations
 
+from datetime import datetime
 from typing import Any
 from uuid import UUID
 
@@ -47,6 +48,13 @@ class PlacementOut(BaseModel):
     qty: int
     volumeUsedM3: float
     weightUsedKg: float
+    updatedAt: datetime | None = None
+    """When this placement last changed.
+
+    Carried so Operate mode can tell a *stale* bin from a busy one. "Slow moving" is
+    the one status a viewer cannot infer from quantities, and inventing it randomly —
+    as the original mock data did — makes the legend meaningless.
+    """
 
 
 class BinPlacementsOut(BaseModel):

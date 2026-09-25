@@ -1452,6 +1452,18 @@
           "weightUsedKg": {
             "type": "number",
             "title": "Weightusedkg"
+          },
+          "updatedAt": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Updatedat"
           }
         },
         "type": "object",

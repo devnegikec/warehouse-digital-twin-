@@ -16,5 +16,5 @@
       "layout-core": ["./packages/layout-core/src/index.ts"]
     }
   },
-  "include": ["src", "packages"]
+  "include": ["src", "packages", "e2e", "playwright.config.ts"]
 }

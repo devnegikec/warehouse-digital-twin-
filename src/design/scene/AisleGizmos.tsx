@@ -22,6 +22,7 @@ import { laneStackHeightM, snap, type Aisle, type Centerline, type DerivedBay } 
 
 import { useDesignStore } from '../store/designStore';
 import { COLORS } from '../theme';
+import { rackRuns } from './rackRuns';
 import { useClickNotDrag } from './useClickNotDrag';
 import { useGroundProjector, type GroundPoint } from './useGroundProjector';
 
@@ -72,55 +73,29 @@ type ActiveDrag = {
 /**
  * Turns the compiler's bays into one box per *contiguous* run of bays, so a GAP
  * segment shows as a real break in the rack rather than being glossed over.
- * Derived from the graph rather than re-deriving rack offsets here, so the 2D
- * inspector and the 3D view cannot disagree about where a rack is.
+ *
+ * Grouping comes from `rackRuns`, which is a single linear pass — this used to re-group
+ * the bays once per lane, which is O(bays × lanes) and cannot survive the 100k target.
+ * The transforms are derived from the graph rather than re-deriving rack offsets here, so
+ * the 2D inspector and the 3D view cannot disagree about where a rack is.
  */
 function runsByLane(bays: DerivedBay[], laneCodes: string[]): Map<string, LaneRun[]> {
-  const grouped = new Map<string, DerivedBay[]>();
-  for (const bay of bays) {
-    if (!laneCodes.includes(bay.laneCode)) continue;
-    const list = grouped.get(bay.laneCode);
-    if (list) list.push(bay);
-    else grouped.set(bay.laneCode, [bay]);
-  }
-
   const result = new Map<string, LaneRun[]>();
-  for (const [laneCode, list] of grouped) {
-    const sorted = [...list].sort((a, b) => a.seq - b.seq);
-    const runs: LaneRun[] = [];
-    let run: DerivedBay[] = [];
 
-    const flush = () => {
-      if (run.length === 0) return;
-      const first = run[0]!;
-      const last = run[run.length - 1]!;
-      const alongX = first.rotationDeg === 0;
-      const span = run.length * first.widthM;
-      const distance = Math.abs(alongX ? last.center.x - first.center.x : last.center.z - first.center.z);
-      const length = Math.max(run.length > 1 ? distance + first.widthM : span, 0.1);
-
-      runs.push({
-        key: `${laneCode}:${first.seq}`,
-        laneCode,
-        position: [
-          alongX ? (first.center.x + last.center.x) / 2 : first.center.x,
-          0,
-          alongX ? first.center.z : (first.center.z + last.center.z) / 2,
-        ],
-        size: [alongX ? length : first.depthM, 0, alongX ? first.depthM : length],
-      });
-      run = [];
+  for (const run of rackRuns(bays, laneCodes)) {
+    const alongX = run.rotationDeg === 0;
+    const laneRuns = result.get(run.laneCode);
+    const entry: LaneRun = {
+      key: run.key,
+      laneCode: run.laneCode,
+      position: [run.center.x, 0, run.center.z],
+      size: [alongX ? run.widthM : run.depthM, 0, alongX ? run.depthM : run.widthM],
     };
 
-    for (const bay of sorted) {
-      const previous = run[run.length - 1];
-      if (previous && bay.seq !== previous.seq + 1) flush();
-      run.push(bay);
-    }
-    flush();
-
-    result.set(laneCode, runs);
+    if (laneRuns) laneRuns.push(entry);
+    else result.set(run.laneCode, [entry]);
   }
+
   return result;
 }
 

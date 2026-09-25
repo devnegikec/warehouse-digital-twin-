@@ -32,14 +32,27 @@ import {
   utilizationColor,
   utilizationOf,
 } from '../persistence/inventory';
-import { getInventory, setDropTarget, useInventory } from '../persistence/inventoryStore';import { useClickNotDrag } from './useClickNotDrag';
+import { getInventory, setDropTarget, useInventory } from '../persistence/inventoryStore';
+import { useClickNotDrag } from './useClickNotDrag';
 
-function capacityColor(bin: DerivedBin, minCapacity: number, maxCapacity: number): THREE.Color {
+/** Reused across the colour pass, so 100k bins cost no allocations. */
+const CAPACITY_COLD = new THREE.Color(COLORS.bin);
+const CAPACITY_WARM = new THREE.Color('#dbe4ef');
+
+function capacityColor(
+  target: THREE.Color,
+  bin: DerivedBin,
+  minCapacity: number,
+  maxCapacity: number,
+): THREE.Color {
   const span = maxCapacity - minCapacity;
   const t = span > 1e-9 ? (bin.capacityM3 - minCapacity) / span : 0;
   // 0 -> slate, 1 -> warm. Uses three's own lerp so it stays in the sRGB working space.
-  return new THREE.Color(COLORS.bin).lerp(new THREE.Color('#dbe4ef'), t * 0.75 + 0.1);
+  return target.copy(CAPACITY_COLD).lerp(CAPACITY_WARM, t * 0.75 + 0.1);
 }
+
+/** How many selected bins get an outline mesh before the rest fall back to the base colour. */
+const MAX_SELECTED_OUTLINES = 64;
 
 export function BinsInstanced() {
   const bins = useDesignStore((state) => state.graph.bins);
@@ -74,33 +87,68 @@ export function BinsInstanced() {
     return { minCapacity: min, maxCapacity: max };
   }, [bins]);
 
+  /**
+   * Two separate passes on purpose.
+   *
+   * Transforms only change when the *geometry* changes; colours change on hover, on
+   * selection, and after a placement. Doing both in one effect meant every pointer move
+   * rebuilt 100k matrices — the exact cost the instanced mesh exists to avoid. The
+   * transforms are now rebuilt on a layout edit, and a hover touches nothing but an
+   * overlay mesh.
+   */
   useEffect(() => {
     const mesh = meshRef.current;
     if (!mesh) return;
 
     const dummy = new THREE.Object3D();
-    const color = new THREE.Color();
-
     bins.forEach((bin, index) => {
       dummy.position.set(bin.center.x, bin.center.y, bin.center.z);
       dummy.rotation.set(0, THREE.MathUtils.degToRad(bin.rotationDeg), 0);
       dummy.scale.set(bin.widthM, bin.heightM, bin.depthM);
       dummy.updateMatrix();
       mesh.setMatrixAt(index, dummy.matrix);
+    });
 
-      if (selectedBinCodes.has(bin.code)) color.set(COLORS.binSelected);
-      else if (hoveredBinCode === bin.code) color.set(COLORS.binHover);
-      else if (heatmap) color.set(utilizationColor(utilizationOf(binIndexByCode.get(bin.code))));
-      else color.copy(capacityColor(bin, minCapacity, maxCapacity));
+    mesh.instanceMatrix.needsUpdate = true;
+    // The bounding sphere has to be recomputed or a large layout gets frustum-culled
+    // from the wrong centre.
+    mesh.computeBoundingSphere();
+  }, [bins]);
+
+  useEffect(() => {
+    const mesh = meshRef.current;
+    if (!mesh) return;
+
+    const color = new THREE.Color();
+    bins.forEach((bin, index) => {
+      if (heatmap) color.set(utilizationColor(utilizationOf(binIndexByCode.get(bin.code))));
+      else capacityColor(color, bin, minCapacity, maxCapacity);
 
       mesh.setColorAt(index, color);
     });
 
-    mesh.instanceMatrix.needsUpdate = true;
     if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
-    // `binIndexByCode` is in the deps so colours refresh after a placement, while the
-    // transforms are only rebuilt when the geometry itself changes.
-  }, [bins, hoveredBinCode, selectedBinCodes, minCapacity, maxCapacity, heatmap, binIndexByCode]);
+    // `binIndexByCode` is in the deps so colours refresh after a placement.
+  }, [bins, heatmap, binIndexByCode, minCapacity, maxCapacity]);
+
+  /**
+   * Selected bins, as outlines.
+   *
+   * Kept out of the instance buffer for the same reason as hover: a selection change
+   * would otherwise rewrite every colour. Capped, because a bulk selection is aimed at
+   * thousands of bins and one mesh each would be worse than the problem it solves.
+   */
+  const selectedBins = useMemo(() => {
+    if (selectedBinCodes.size === 0) return [];
+    const found: DerivedBin[] = [];
+    for (const bin of bins) {
+      if (selectedBinCodes.has(bin.code)) {
+        found.push(bin);
+        if (found.length >= MAX_SELECTED_OUTLINES) break;
+      }
+    }
+    return found;
+  }, [bins, selectedBinCodes]);
 
   /**
    * Resolve the bin under the pointer while a drag is in flight.
@@ -194,6 +242,48 @@ export function BinsInstanced() {
         <boxGeometry args={[1, 1, 1]} />
         <meshStandardMaterial vertexColors roughness={0.7} metalness={0.15} />
       </instancedMesh>
+
+      {/*
+        * Hover and selection are drawn *over* the instances rather than written into
+        * their colour buffer. A pointer move therefore costs one mesh instead of
+        * rewriting (and re-uploading) every instance colour in the layout.
+        */}
+      {hoveredBin && (
+        <mesh
+          position={[hoveredBin.center.x, hoveredBin.center.y, hoveredBin.center.z]}
+          rotation={[0, THREE.MathUtils.degToRad(hoveredBin.rotationDeg), 0]}
+        >
+          <boxGeometry
+            args={[hoveredBin.widthM * 1.04, hoveredBin.heightM * 1.04, hoveredBin.depthM * 1.04]}
+          />
+          <meshStandardMaterial
+            color={COLORS.binHover}
+            emissive={COLORS.binHover}
+            emissiveIntensity={0.35}
+            transparent
+            opacity={0.55}
+            depthWrite={false}
+          />
+        </mesh>
+      )}
+
+      {selectedBins.map((bin) => (
+        <mesh
+          key={`sel-${bin.code}`}
+          position={[bin.center.x, bin.center.y, bin.center.z]}
+          rotation={[0, THREE.MathUtils.degToRad(bin.rotationDeg), 0]}
+        >
+          <boxGeometry args={[bin.widthM * 1.06, bin.heightM * 1.06, bin.depthM * 1.06]} />
+          <meshStandardMaterial
+            color={COLORS.binSelected}
+            emissive={COLORS.binSelected}
+            emissiveIntensity={0.4}
+            transparent
+            opacity={0.7}
+            depthWrite={false}
+          />
+        </mesh>
+      ))}
 
       {hoveredBin && (
         <Html

@@ -23,7 +23,7 @@ from sqlalchemy.orm import Session
 
 from ...db import get_session
 from ...layout import DocumentInvalid, build_layout
-from ...models import Bin, LayoutVersion, VersionStatus, Warehouse
+from ...models import Aisle, Bay, Bin, Lane, LayoutVersion, VersionStatus, Warehouse
 from ...schemas import (
     DraftOut,
     DraftPut,
@@ -461,6 +461,20 @@ def get_published_layout(warehouse_id: uuid.UUID, session: SessionDep) -> Publis
         select(Bin).where(Bin.warehouse_id == warehouse_id).order_by(Bin.code)
     ).all()
 
+    # Aisle and lane identity is joined in rather than parsed back out of the bin code:
+    # the code pattern is per-lane and configurable, so parsing it would work for the
+    # default layout and quietly break for a custom one.
+    identity = {
+        row[0]: (row[1], row[2], row[3], row[4])
+        for row in session.execute(
+            select(Bin.id, Aisle.code, Lane.code, Lane.side, Bay.seq)
+            .join(Bay, Bay.id == Bin.bay_id)
+            .join(Lane, Lane.id == Bay.lane_id)
+            .join(Aisle, Aisle.id == Lane.aisle_id)
+            .where(Bin.warehouse_id == warehouse_id)
+        ).all()
+    }
+
     recompiled = build_layout(published.doc)
     conflicts: list[str] = []
     if recompiled.hash != published.doc_hash:
@@ -482,6 +496,10 @@ def get_published_layout(warehouse_id: uuid.UUID, session: SessionDep) -> Publis
             {
                 "id": str(bin_.id),
                 "code": bin_.code,
+                "aisleCode": identity.get(bin_.id, ("", "", "", 0))[0],
+                "laneCode": identity.get(bin_.id, ("", "", "", 0))[1],
+                "side": identity.get(bin_.id, ("", "", "", 0))[2],
+                "baySeq": identity.get(bin_.id, ("", "", "", 0))[3],
                 "levelIndex": bin_.level_index,
                 "center": {"x": bin_.center_x, "y": bin_.center_y, "z": bin_.center_z},
                 "widthM": bin_.width_m,

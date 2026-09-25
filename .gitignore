@@ -23,6 +23,15 @@ dist-ssr
 *.sln
 *.sw?
 
+# Playwright
+# test-results holds traces and screenshots for failed journeys. They are useful while
+# debugging a failure and useless in history — they are large, binary, and specific to one
+# run of one machine. Keep the HTML report out for the same reason.
+test-results/
+playwright-report/
+blob-report/
+.playwright/
+
 # Python API
 server/.venv/
 server/.env

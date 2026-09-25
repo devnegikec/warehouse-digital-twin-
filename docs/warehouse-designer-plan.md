@@ -1182,20 +1182,96 @@ Notable fixtures: `014_lane_overlap` (aisles placed 1 m apart — invisible to a
 - **`DerivedBin` has no `id`, by design** — the database assigns surrogates and everything is keyed on `code`. So the bin code is the join key between the compiler's bins and the published rows, in both the heatmap and the drop.
 - **A client verdict only decides whether to ask.** The server revalidates and its answer is shown, so a disagreement surfaces as the server's code rather than as a phantom success.
 
-### Next: Phase 9
+### Phase 9 — Operate mode on the published layout · COMPLETE
 
-1. **Phase 9** — Operate mode on the published layout: retire `mockData.js` and the hardcoded `CONFIG` in `WarehouseCanvas.jsx`, both becoming projections of `GET /layout`, with the mode switcher in `App.tsx`.
+| Deliverable | Evidence |
+|---|---|
+| `mockData.js` retired | Deleted, along with `ControlPanel`, `ViewerPanel`, `WarehouseCanvas`, `RackSlot`, `PickingPath` and the hardcoded `CONFIG`. The status vocabulary, colours and icons moved to `operate/slots.ts`. |
+| One source, two modes | `operate/layoutSource.ts` reads the **published** layout when a warehouse is open and the **working copy** otherwise. Both hand the same `OperateBin` shape to `deriveSlots`, so the projection — and the rendering — cannot differ. |
+| Status is derived, not invented | `empty` / `low_stock` / `current_stock` / `slow_moving`, computed from what is actually placed and when it last changed. The original picked a status at random, so its legend described nothing. |
+| Rack steel from the layout | `operate/RackStructure.tsx` derives uprights and beams from the bins themselves, as **two InstancedMeshes** rather than one mesh per member. A layout with ten bays or ten levels draws correctly with no configuration. |
+| Picking route from real aisles | `operate/PickingRoute.tsx` builds a serpentine route from the aisles' actual centrelines — recovered by averaging the two rack faces — instead of indexed bay numbers against a fixed spacing. |
+| The floor is the warehouse | Floor, grid and camera extent come from the document's footprint; the camera refits on every reload. |
+| Source badge | "Published v3" and "working copy (not published)" look identical in 3D, and acting on the wrong one is the failure worth designing against, so the badge is prominent and colour-coded. |
+
+**DoD met, end to end.** *A layout designed in Design mode renders identically in Operate mode; the picking route still works.*
+
+`src/operate/operate.integration.test.ts` publishes a real layout to a real server, loads it back the way an operator would, and compares the two projections slot by slot: **360 bins, same positions, sizes, rotations, capacities, aisle/lane codes, bays and levels.** Alongside it, `slots.test.ts` proves the projection is lossless for any bin list, and `PickingRoute.test.ts` proves the route walks the *corridor* between the two rack faces rather than along one of them.
+
+The chain has no untested link: compiled bins → published rows (`server/tests/test_persistence.py`, field by field) → operate slots (`operate.integration.test.ts`).
+
+#### Design decisions worth recording
+
+- **The published bin dict carries its own aisle and lane codes.** My first pass parsed them back out of the bin code — which would have worked for the default pattern and quietly broken for any lane with a custom `binCodePattern`. The server now resolves them by join, so identity is never inferred from a template.
+- **`slow_moving` needed a real signal.** The placement's `updated_at` was added to the DTO for it. Without a timestamp the status would have been a guess, which is exactly the problem the mock data had.
+- **Local mode shows no inventory, deliberately.** A placement only exists against a published bin, so inventing stock for the working copy would be a lie in the one screen an operator trusts.
+- **Operate mode cannot edit.** `slots` is derived and every control is a filter or a view toggle; there is no command path from this mode into the document.
+
+### Phase 10 — Hardening · COMPLETE
+
+| Deliverable | Evidence |
+|---|---|
+| Performance guards in CI | `src/design/performance.test.ts` — 7 tests, ~7 s. Ceilings, each recorded next to the idle measurement it came from: compile 100k bins < 15 s (measured 1769 ms), project < 1.5 s (12 ms), summarise < 500 ms (3 ms), run grouping < 500 ms (2 ms), opening layout < 250 ms (1.4 ms), plus a < 10× ratio for 4× the bays and structural assertions that the plan view stays ≤ lanes × 4 rectangles. |
+| Seed script | `server/seed.py`: `--code DEMO --aisles 12 --fill 0.6 --skus 7 --seed 7` → `seeded DEMO: 12 aisles, 1440 bins, version 1, 7 SKUs, 864 placements`. Fills by trying quantity 1, 2, 3, 6, 10 per bin and keeping the largest that actually fits, so the result is a *legal* layout rather than a plausible-looking one. |
+| End-to-end suite | `e2e/design.spec.ts` — 7 journeys in Chromium, 35 s: an edit through a real input reaches the compiler; one Enter is one undo entry; Escape discards; the gate blocks, names the rule, and unblocks when fixed; warnings do not block; operate mode reports the bins the designer compiled. |
+| README + operator manual | `README.md` rewritten from the Vite template; `docs/operator-manual.md` written for the person running the warehouse — badge meanings, filters, bin inspection, what the numbers mean, and what cannot be done from that mode. |
+| Bundle split | `three` 923 kB · `react` 193 kB · app 229 kB, from one 1.35 MB chunk. |
+| Operate-mode cleanup | `src/mockData.js` and the whole of `src/components/` deleted in Phase 9; no dead code left behind. |
+
+**DoD met.** *The tool is documented, seeded, measured, and guarded against regression.*
+
+#### Performance fixes (found by the new guards, not by feeling)
+
+| Fix | Why it mattered |
+|---|---|
+| `rackRuns()` extracted from the 3D racks and reused by the plan view | Run grouping was `laneCodes.includes()` *inside* the bay loop — O(bays × lanes). Replaced with one linear pass over a `Set`. The plan view was also drawing one SVG rect **per bay**; it now draws one per run. |
+| Hover and selection became overlay meshes | Hovering a bin rewrote an instance colour buffer, i.e. 100k colours to highlight one. Both are now separate small meshes, and selection outlines are capped at 64. |
+| Two effects instead of one in `BinsInstanced` | Matrices are rebuilt only when the bins change; colours only when the colour inputs change. Previously every colour change re-uploaded every matrix. |
+| Explicit `new_uuid()` in the materialiser | Per-row `session.flush()` calls were removed once ids were assigned client-side. At the 100k-bin target that was 100k round trips. |
+| Module-level `Colour` objects | The capacity gradient allocated two `THREE.Color` instances per bin per frame. |
+
+#### Bugs the end-to-end suite caught on its first run
+
+The suite was written to prove the app worked; it found two defects in the first component it touched.
+
+| Bug | Symptom | Cause |
+|---|---|---|
+| One Enter press recorded **two** edits | 360 bins → 325 instead of 150, and the first undo appeared to do nothing | `commit()` ran twice per Enter: once from `onKeyDown`, then again from the `blur()` it triggered, whose closure still held the pre-`setDraft(null)` draft. |
+| **Escape committed the value it was told to discard** | The documented "reverts on Escape" behaved as "commits on Escape" | The same stale closure: `setDraft(null)` then `blur()` → `onBlur`'s `commit()` saw the old draft and committed it. |
+
+Both are fixed by mirroring the pending draft in a `ref` and clearing it synchronously inside `commit`, which makes a commit idempotent within a tick and lets Escape mean what it says. Neither is reachable from a unit test that calls the command layer directly — they only exist in the gap between a keystroke and the DOM, which is exactly the gap the browser suite covers.
+
+#### Design decisions worth recording
+
+- **Splitting vendor chunks is about caching, not first paint.** All three chunks are still loaded on first visit. The reason to separate `three` is that it changes on a different schedule from application code, so an app fix does not invalidate a 923 kB download the browser already has.
+- **The chunk size warning limit was raised deliberately, to 1000 kB.** The `three` chunk is a third-party artefact of fixed size; a warning that can only be silenced by not using three.js is noise, and noise trains people to ignore warnings. The number is documented next to the setting.
+- **Frame time is not asserted in CI.** It depends on the GPU, the driver and whatever else the machine is doing. The guards assert *algorithmic* properties — that run grouping is linear, that the plan view is bounded by lanes rather than bays — which hold anywhere and are what actually regresses.
+- **Compiling is not linear, and the guards had to admit it.** Measured here: 4.2× the bins costs 11.9× the time, 8.3× costs 32.7× — roughly n^1.7, from allocation and cache pressure rather than one hot spot. So no *ratio* budget is asserted for compilation: against a baseline that steep, a quadratic regression would be ~69×, barely distinguishable from normal, and the budget would be either meaningless or flaky. Compilation gets a generous ceiling that catches a catastrophic blow-up; the operations that really are linear (projection, summary, run grouping) get ceilings with two orders of magnitude of discriminating power. 100k bins in 1.8 s is comfortably inside the design's assumption; the trend is recorded here so that a future 10× regression is not mistaken for noise.
+- **A budget sitting near the test-runner's default timeout is not a budget.** The first version asserted a 4 s compile inside vitest's 5 s default test timeout, so under load the test died as an opaque "Test timed out" *before* its own assertion could report a number. Every timing test now sets an explicit timeout well above its ceiling, so a failure always names the measurement that was exceeded.
+- **Measurements are recorded next to the budgets.** Without them, the reader of a failure cannot tell a regression from a machine having a bad day, and the reflex is to raise the number. The first draft of these budgets was wrong by 4× because it was reasoned rather than measured — the ratio assertion had to be thrown away once the real figure was known.
+- **The end-to-end suite does not click in the 3D canvas.** A raycast against a 360-bin instanced mesh is worth testing, but it is the least stable part of any such suite; the structure tree drives the same commands, so the journeys stay tests of the application rather than of the canvas.
+- **The e2e server runs on a pinned port (5180), on IPv4.** A stale dev server on 5173 makes Vite silently move to 5174, and Playwright then waits forever on a port nothing serves — a failure that reads as a broken test rather than a busy port. The same caution applies to IPv6: a server bound only to `::1` is unreachable at the `127.0.0.1` that Playwright probes. Both bit this workspace, at ports 5173 and 8000.
+- **`npm run test:e2e` is not part of `npm run verify`.** It needs a browser download and a running dev server. Folding a slow, environment-sensitive step into `verify` is how `verify` becomes something people stop running.
 
 ### Commands
 
 ```bash
 npm run db:up          # Postgres 16 on :5433 (no clash with Homebrew on :5432)
 npm run api:migrate    # alembic upgrade head
-npm run api:dev        # FastAPI on :8000, OpenAPI at /docs
+npm run api:dev        # FastAPI on :8000 — use --port 8001 if :8000 is taken, and set
+                       # VITE_API_URL=http://127.0.0.1:8001 for the app
+npm run seed           # seed a DEMO warehouse with inventory
 npm test               # TypeScript suite
+npm run test:app       # editor suite (includes the performance budgets)
+npm run test:e2e       # Playwright journeys (needs: npm run test:e2e:install)
 npm run test:py        # Python suite (includes cross-language conformance)
 npm run verify         # everything: typecheck, both suites, lint, migration cycle
 ```
+
+The three tests that talk to a live server — `drift.test.ts`, `placement.test.ts`,
+`operate.integration.test.ts` — skip themselves when no API answers `/health`, and say so in
+their titles rather than passing silently. Run them with an API up to exercise the
+cross-language and design↔operate guarantees for real.
 
 ## 14. The one real cost of this architecture
 

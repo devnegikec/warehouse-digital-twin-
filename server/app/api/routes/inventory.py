@@ -124,6 +124,7 @@ def _placement_out(bin_code: str, placement: Placement, sku_code: str) -> Placem
         qty=placement.qty,
         volumeUsedM3=placement.volume_used_m3,
         weightUsedKg=placement.weight_used_kg,
+        updatedAt=placement.updated_at,
     )
 
 

@@ -17,6 +17,7 @@ import { useMemo, useState } from 'react';
 import type { Aisle } from 'layout-core';
 
 import { useDesignStore } from '../store/designStore';
+import { rackRuns } from '../scene/rackRuns';
 import { COLORS } from '../theme';
 
 type Rect = { x: number; z: number; width: number; height: number };
@@ -55,10 +56,13 @@ export function MiniMap() {
     return map;
   }, [aisles]);
 
-  // Only bays that actually produce bins are drawn as racks. Gap and skipped bays are
-  // omitted on purpose: this is a picture of the racking, not of the bay numbering.
-  const racks = useMemo(
-    () => bays.filter((bay) => bay.inRackRun && !bay.isSkipped),
+  // Racks are drawn one rectangle per *contiguous run*, not one per bay. At the 100k-bin
+  // target a rectangle per bay would put tens of thousands of nodes in the DOM, and the
+  // plan view would be what made the editor slow. A run is also what the 3D view draws,
+  // so the two agree. Gap and skipped bays are excluded on purpose: this is a picture of
+  // the racking, not of the bay numbering.
+  const runs = useMemo(
+    () => rackRuns(bays.filter((bay) => bay.inRackRun && !bay.isSkipped)),
     [bays],
   );
 
@@ -109,19 +113,19 @@ export function MiniMap() {
             />
             <rect x={origin.x} y={origin.z} width={lengthM} height={widthM} fill="url(#minimap-grid)" />
 
-            {/* Racks, from the derived bays. */}
-            {racks.map((bay) => {
-              const alongX = bay.rotationDeg === 0;
-              const width = alongX ? bay.widthM : bay.depthM;
-              const height = alongX ? bay.depthM : bay.widthM;
-              const lane = laneIdByCode.get(bay.laneCode);
+            {/* Racks, as one rectangle per contiguous run. */}
+            {runs.map((run) => {
+              const alongX = run.rotationDeg === 0;
+              const width = alongX ? run.widthM : run.depthM;
+              const height = alongX ? run.depthM : run.widthM;
+              const lane = laneIdByCode.get(run.laneCode);
               const isSelected = lane ? selectedLaneIds.has(lane.laneId) : false;
 
               return (
                 <rect
-                  key={`${bay.laneCode}:${bay.seq}`}
-                  x={bay.center.x - width / 2}
-                  y={bay.center.z - height / 2}
+                  key={run.key}
+                  x={run.center.x - width / 2}
+                  y={run.center.z - height / 2}
                   width={width}
                   height={height}
                   fill={isSelected ? COLORS.aisleSelected : 'rgba(96,165,250,0.30)'}
@@ -130,7 +134,7 @@ export function MiniMap() {
                   className={lane ? 'minimap-clickable' : undefined}
                   onClick={() => lane && select({ kind: 'lane', id: lane.laneId, label: lane.label })}
                 >
-                  <title>{`${bay.laneCode} bay ${bay.seq}`}</title>
+                  <title>{`${run.laneCode} — ${run.bayCount} bay${run.bayCount === 1 ? '' : 's'}`}</title>
                 </rect>
               );
             })}
@@ -189,7 +193,8 @@ export function MiniMap() {
           </svg>
 
           <div className="minimap-foot">
-            {aisles.length} aisle{aisles.length === 1 ? '' : 's'} · {racks.length} rack bays ·{' '}
+            {aisles.length} aisle{aisles.length === 1 ? '' : 's'} · {runs.length} rack run
+            {runs.length === 1 ? '' : 's'} ·{' '}
             {obstacles.length} obstacle{obstacles.length === 1 ? '' : 's'}
           </div>
         </>

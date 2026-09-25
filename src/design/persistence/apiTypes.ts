@@ -564,6 +564,8 @@ export interface components {
             volumeUsedM3: number;
             /** Weightusedkg */
             weightUsedKg: number;
+            /** Updatedat */
+            updatedAt?: string | null;
         };
         /** PublishOut */
         PublishOut: {

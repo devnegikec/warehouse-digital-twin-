@@ -7,8 +7,16 @@
  *  - The inspector must be able to override a drag (P12). Typing always wins.
  *  - Committing per keystroke would push one undo entry per character, so undo
  *    would rewind "1", "12", "121" instead of the edit.
+ *
+ * The pending draft is held in a ref as well as in state, and that is load bearing. `commit`
+ * necessarily runs twice for a single Enter: once from the key handler, and again from the
+ * blur that handler triggers. React has not re-rendered in between, so the blur's closure
+ * still sees the old draft and `setDraft(null)` has not taken effect — which used to push
+ * the same edit onto the undo stack twice, so one undo appeared to do nothing. The same
+ * stale closure made Escape *commit* the value it was supposed to discard. The ref is
+ * cleared synchronously, so the second call, and every Escape, now returns early.
  */
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 
 type Props = {
   label: string;
@@ -37,11 +45,18 @@ export function NumberField({
   error,
 }: Props) {
   const [draft, setDraft] = useState<string | null>(null);
+  const pending = useRef<string | null>(null);
+
+  const edit = (next: string | null) => {
+    pending.current = next;
+    setDraft(next);
+  };
 
   const commit = () => {
-    if (draft === null) return;
-    const parsed = Number(draft);
-    setDraft(null);
+    const raw = pending.current;
+    if (raw === null) return;
+    edit(null);
+    const parsed = Number(raw);
     if (!Number.isFinite(parsed) || parsed === value) return;
     onCommit(parsed);
   };
@@ -58,14 +73,14 @@ export function NumberField({
           min={min}
           max={max}
           disabled={disabled}
-          onChange={(event) => setDraft(event.target.value)}
+          onChange={(event) => edit(event.target.value)}
           onBlur={commit}
           onKeyDown={(event) => {
             if (event.key === 'Enter') {
               commit();
               event.currentTarget.blur();
             } else if (event.key === 'Escape') {
-              setDraft(null);
+              edit(null);
               event.currentTarget.blur();
             }
           }}
@@ -90,11 +105,17 @@ export function TextField({
   hint?: string;
 }) {
   const [draft, setDraft] = useState<string | null>(null);
+  const pending = useRef<string | null>(null);
+  const edit = (next: string | null) => {
+    pending.current = next;
+    setDraft(next);
+  };
 
   const commit = () => {
-    if (draft === null) return;
-    const next = draft.trim();
-    setDraft(null);
+    const raw = pending.current;
+    if (raw === null) return;
+    edit(null);
+    const next = raw.trim();
     if (next.length === 0 || next === value) return;
     onCommit(next);
   };
@@ -106,14 +127,14 @@ export function TextField({
         <input
           type="text"
           value={draft ?? value}
-          onChange={(event) => setDraft(event.target.value)}
+          onChange={(event) => edit(event.target.value)}
           onBlur={commit}
           onKeyDown={(event) => {
             if (event.key === 'Enter') {
               commit();
               event.currentTarget.blur();
             } else if (event.key === 'Escape') {
-              setDraft(null);
+              edit(null);
               event.currentTarget.blur();
             }
           }}

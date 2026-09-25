@@ -30,7 +30,7 @@ from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from ..layout import DocumentInvalid, LayoutGraph, build_layout, validate_document
-from ..models import Aisle, Bay, Bin, Lane, LayoutVersion, VersionStatus, Warehouse
+from ..models import Aisle, Bay, Bin, Lane, LayoutVersion, VersionStatus, Warehouse, new_uuid
 
 
 class PersistenceError(Exception):
@@ -291,6 +291,11 @@ def materialize(session: Session, warehouse: Warehouse, graph: LayoutGraph) -> l
     would silently detach every placement on every publish.
 
     Returns the placements that could not survive because their bin is gone.
+
+    Ids are generated here with ``new_uuid`` rather than left to the database default,
+    because a child needs its parent's id to be insertable. Relying on a flush to obtain
+    it meant one flush per bay and per bin — tolerable at 360 bins and 100k round trips at
+    the stated target.
     """
     warehouse_id = warehouse.id
 
@@ -325,7 +330,7 @@ def materialize(session: Session, warehouse: Warehouse, graph: LayoutGraph) -> l
     for aisle_seq, aisle_doc in enumerate(graph.doc["aisles"]):
         aisle = existing_aisles.get(aisle_doc["code"])
         if aisle is None:
-            aisle = Aisle(warehouse_id=warehouse_id, code=aisle_doc["code"])
+            aisle = Aisle(id=new_uuid(), warehouse_id=warehouse_id, code=aisle_doc["code"])
             session.add(aisle)
         centerline = aisle_doc["centerline"]
         aisle.orientation = aisle_doc["orientation"]
@@ -337,7 +342,6 @@ def materialize(session: Session, warehouse: Warehouse, graph: LayoutGraph) -> l
         aisle.travel_direction = aisle_doc.get("travelDirection", "BOTH")
         aisle.seq = aisle_seq
         kept_aisles.add(aisle.code)
-        session.flush()
 
         existing_lanes = {lane.code: lane for lane in aisle.lanes}
         kept_lanes: set[str] = set()
@@ -345,7 +349,7 @@ def materialize(session: Session, warehouse: Warehouse, graph: LayoutGraph) -> l
         for lane_seq, lane_doc in enumerate(aisle_doc.get("lanes", [])):
             lane = existing_lanes.get(lane_doc["code"])
             if lane is None:
-                lane = Lane(aisle_id=aisle.id, code=lane_doc["code"])
+                lane = Lane(id=new_uuid(), aisle_id=aisle.id, code=lane_doc["code"])
                 session.add(lane)
             lane.side = lane_doc["side"]
             lane.rack_type_code = _rack_type_code(graph, lane_doc.get("rackTypeId"))
@@ -356,7 +360,6 @@ def materialize(session: Session, warehouse: Warehouse, graph: LayoutGraph) -> l
             lane.bin_code_pattern = lane_doc["binCodePattern"]
             lane.seq = lane_seq
             kept_lanes.add(lane.code)
-            session.flush()
 
             existing_bays = {bay.seq: bay for bay in lane.bays}
             kept_bays: set[int] = set()
@@ -364,7 +367,7 @@ def materialize(session: Session, warehouse: Warehouse, graph: LayoutGraph) -> l
             for bay_doc in bays_by_lane.get(lane.code, []):
                 bay = existing_bays.get(bay_doc.seq)
                 if bay is None:
-                    bay = Bay(lane_id=lane.id, seq=bay_doc.seq)
+                    bay = Bay(id=new_uuid(), lane_id=lane.id, seq=bay_doc.seq)
                     session.add(bay)
                 bay.start_m = float(
                     bay_doc.center["x"] if bay_doc.rotation_deg == 0 else bay_doc.center["z"]
@@ -372,7 +375,6 @@ def materialize(session: Session, warehouse: Warehouse, graph: LayoutGraph) -> l
                 bay.width_m = float(bay_doc.width_m)
                 bay.is_skipped = bool(bay_doc.is_skipped)
                 kept_bays.add(bay_doc.seq)
-                session.flush()
                 # Registered here, not read back from the ORM afterwards: a lane created
                 # in this transaction has an empty in-memory `bays` collection, so a
                 # lookup through the relationships would miss exactly these rows.
@@ -401,7 +403,7 @@ def materialize(session: Session, warehouse: Warehouse, graph: LayoutGraph) -> l
 
         bin_ = existing_bins.get(derived.code)
         if bin_ is None:
-            bin_ = Bin(warehouse_id=warehouse_id, code=derived.code)
+            bin_ = Bin(id=new_uuid(), warehouse_id=warehouse_id, code=derived.code)
             session.add(bin_)
         bin_.bay_id = bay_row.id
         bin_.level_index = derived.level_index
