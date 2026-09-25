@@ -1,0 +1,203 @@
+{
+  "schemaVersion": 1,
+  "warehouse": {
+    "code": "WH-C",
+    "name": "High-bay freezer: double-deep lanes and two cross-aisles",
+    "lengthM": 36,
+    "widthM": 24,
+    "heightM": 12,
+    "origin": { "x": 0, "z": 0 },
+    "metadata": {
+      "temperatureC": -22,
+      "site": "North DC",
+      "note": "7 levels, two 1-bay cross-aisles splitting every lane into thirds"
+    }
+  },
+  "rackTypes": [
+    {
+      "id": "rt-freeze",
+      "code": "FRZ",
+      "name": "Freezer rack (single deep)",
+      "bayWidthM": 2.7,
+      "depthM": 1.3,
+      "uprightWidthM": 0.15,
+      "uprightDepthM": 0.15,
+      "metadata": { "minTempC": -30 }
+    },
+    {
+      "id": "rt-deep",
+      "code": "DP2",
+      "name": "Double-deep pallet lane",
+      "bayWidthM": 2.7,
+      "depthM": 2.2,
+      "uprightWidthM": 0.15,
+      "uprightDepthM": 0.15,
+      "metadata": { "positionsDeep": 2 }
+    }
+  ],
+  "obstacles": [
+    {
+      "id": "col-1",
+      "kind": "COLUMN",
+      "x": 8,
+      "z": 11.75,
+      "widthM": 0.6,
+      "depthM": 0.6,
+      "heightM": 8
+    },
+    {
+      "id": "col-2",
+      "kind": "COLUMN",
+      "x": 20,
+      "z": 11.75,
+      "widthM": 0.6,
+      "depthM": 0.6,
+      "heightM": 8
+    },
+    {
+      "id": "wall-1",
+      "kind": "WALL",
+      "x": 0,
+      "z": 0,
+      "widthM": 6,
+      "depthM": 1,
+      "heightM": 3
+    },
+    {
+      "id": "office-1",
+      "kind": "OFFICE",
+      "x": 28,
+      "z": 8,
+      "widthM": 6,
+      "depthM": 8,
+      "heightM": 4,
+      "metadata": { "purpose": "shift office" }
+    },
+    {
+      "id": "conv-1",
+      "kind": "CUSTOM",
+      "x": 10,
+      "z": 22,
+      "widthM": 8,
+      "depthM": 1,
+      "heightM": 1.2,
+      "metadata": { "purpose": "conveyor to dock" }
+    }
+  ],
+  "aisles": [
+    {
+      "id": "a-1",
+      "code": "A01",
+      "orientation": "X",
+      "centerline": { "x1": 6, "z1": 7, "x2": 27.6, "z2": 7 },
+      "widthM": 3.6,
+      "travelDirection": "BOTH",
+      "lanes": [
+        {
+          "id": "a-1-l",
+          "code": "A01-L",
+          "side": "LEFT",
+          "rackTypeId": "rt-deep",
+          "startOffsetM": 0,
+          "lengthM": 21.6,
+          "levels": [
+            { "clearHeightM": 1.2, "binDepthM": 2, "beamHeightM": 0.08, "maxWeightKg": 1000 },
+            { "clearHeightM": 1.2, "binDepthM": 2, "beamHeightM": 0.08, "maxWeightKg": 1000 },
+            { "clearHeightM": 1.2, "binDepthM": 2, "beamHeightM": 0.08, "maxWeightKg": 1000 },
+            { "clearHeightM": 1.6, "binDepthM": 2, "beamHeightM": 0.08, "maxWeightKg": 1000 },
+            { "clearHeightM": 1.6, "binDepthM": 2, "beamHeightM": 0.08, "maxWeightKg": 1000 },
+            { "clearHeightM": 1.6, "binDepthM": 2, "beamHeightM": 0.08, "maxWeightKg": 1000 },
+            { "clearHeightM": 1.6, "binDepthM": 2, "beamHeightM": 0.08, "maxWeightKg": 1000 }
+          ],
+          "segments": [
+            { "kind": "RACK", "startM": 0, "endM": 5.4, "label": "third 1" },
+            { "kind": "GAP", "startM": 5.4, "endM": 8.1, "label": "cross-aisle west" },
+            { "kind": "RACK", "startM": 8.1, "endM": 13.5, "label": "third 2" },
+            { "kind": "GAP", "startM": 13.5, "endM": 16.2, "label": "cross-aisle east" },
+            { "kind": "RACK", "startM": 16.2, "endM": 21.6, "label": "third 3" }
+          ]
+        },
+        {
+          "id": "a-1-r",
+          "code": "A01-R",
+          "side": "RIGHT",
+          "rackTypeId": "rt-freeze",
+          "startOffsetM": 0,
+          "lengthM": 21.6,
+          "levels": [
+            { "clearHeightM": 1.2, "binDepthM": 1.2, "beamHeightM": 0.08, "maxWeightKg": 700 },
+            { "clearHeightM": 1.2, "binDepthM": 1.2, "beamHeightM": 0.08, "maxWeightKg": 700 },
+            { "clearHeightM": 1.2, "binDepthM": 1.2, "beamHeightM": 0.08, "maxWeightKg": 700 },
+            { "clearHeightM": 1.6, "binDepthM": 1.2, "beamHeightM": 0.08, "maxWeightKg": 700 },
+            { "clearHeightM": 1.6, "binDepthM": 1.2, "beamHeightM": 0.08, "maxWeightKg": 700 },
+            { "clearHeightM": 1.6, "binDepthM": 1.2, "beamHeightM": 0.08, "maxWeightKg": 700 },
+            { "clearHeightM": 1.6, "binDepthM": 1.2, "beamHeightM": 0.08, "maxWeightKg": 700 }
+          ],
+          "segments": [
+            { "kind": "RACK", "startM": 0, "endM": 5.4, "label": "third 1" },
+            { "kind": "GAP", "startM": 5.4, "endM": 8.1, "label": "cross-aisle west" },
+            { "kind": "RACK", "startM": 8.1, "endM": 13.5, "label": "third 2" },
+            { "kind": "GAP", "startM": 13.5, "endM": 16.2, "label": "cross-aisle east" },
+            { "kind": "RACK", "startM": 16.2, "endM": 21.6, "label": "third 3" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "a-2",
+      "code": "A02",
+      "orientation": "X",
+      "centerline": { "x1": 6, "z1": 17, "x2": 27.6, "z2": 17 },
+      "widthM": 3.4,
+      "travelDirection": "BOTH",
+      "lanes": [
+        {
+          "id": "a-2-l",
+          "code": "A02-L",
+          "side": "LEFT",
+          "rackTypeId": "rt-freeze",
+          "startOffsetM": 0,
+          "lengthM": 21.6,
+          "levels": [
+            { "clearHeightM": 1.4, "binDepthM": 1.2, "beamHeightM": 0.08, "maxWeightKg": 700 },
+            { "clearHeightM": 1.4, "binDepthM": 1.2, "beamHeightM": 0.08, "maxWeightKg": 700 },
+            { "clearHeightM": 1.4, "binDepthM": 1.2, "beamHeightM": 0.08, "maxWeightKg": 700 },
+            { "clearHeightM": 1.4, "binDepthM": 1.2, "beamHeightM": 0.08, "maxWeightKg": 700 },
+            { "clearHeightM": 1.4, "binDepthM": 1.2, "beamHeightM": 0.08, "maxWeightKg": 700 },
+            { "clearHeightM": 1.4, "binDepthM": 1.2, "beamHeightM": 0.08, "maxWeightKg": 700 }
+          ],
+          "segments": [
+            { "kind": "RACK", "startM": 0, "endM": 5.4, "label": "third 1" },
+            { "kind": "GAP", "startM": 5.4, "endM": 8.1, "label": "cross-aisle west" },
+            { "kind": "RACK", "startM": 8.1, "endM": 13.5, "label": "third 2" },
+            { "kind": "GAP", "startM": 13.5, "endM": 16.2, "label": "cross-aisle east" },
+            { "kind": "RACK", "startM": 16.2, "endM": 21.6, "label": "third 3" }
+          ]
+        },
+        {
+          "id": "a-2-r",
+          "code": "A02-R",
+          "side": "RIGHT",
+          "rackTypeId": "rt-deep",
+          "startOffsetM": 0,
+          "lengthM": 21.6,
+          "levels": [
+            { "clearHeightM": 1.4, "binDepthM": 2, "beamHeightM": 0.08, "maxWeightKg": 1000 },
+            { "clearHeightM": 1.4, "binDepthM": 2, "beamHeightM": 0.08, "maxWeightKg": 1000 },
+            { "clearHeightM": 1.4, "binDepthM": 2, "beamHeightM": 0.08, "maxWeightKg": 1000 },
+            { "clearHeightM": 1.4, "binDepthM": 2, "beamHeightM": 0.08, "maxWeightKg": 1000 },
+            { "clearHeightM": 1.4, "binDepthM": 2, "beamHeightM": 0.08, "maxWeightKg": 1000 },
+            { "clearHeightM": 1.4, "binDepthM": 2, "beamHeightM": 0.08, "maxWeightKg": 1000 }
+          ],
+          "segments": [
+            { "kind": "RACK", "startM": 0, "endM": 5.4, "label": "third 1" },
+            { "kind": "GAP", "startM": 5.4, "endM": 8.1, "label": "cross-aisle west" },
+            { "kind": "RACK", "startM": 8.1, "endM": 13.5, "label": "third 2" },
+            { "kind": "GAP", "startM": 13.5, "endM": 16.2, "label": "cross-aisle east" },
+            { "kind": "RACK", "startM": 16.2, "endM": 21.6, "label": "third 3" }
+          ]
+        }
+      ]
+    }
+  ]
+}

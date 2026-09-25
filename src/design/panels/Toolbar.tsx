@@ -14,12 +14,13 @@ import { SessionBar } from './SessionBar';
 type Props = {
   onSwitchMode: () => void;
   onPublish: () => void;
+  onImport: () => void;
   /** Which view of the document the canvas area is showing. */
   view: '3D' | 'PLAN';
   onViewChange: (view: '3D' | 'PLAN') => void;
 };
 
-export function Toolbar({ onSwitchMode, onPublish, view, onViewChange }: Props) {
+export function Toolbar({ onSwitchMode, onPublish, onImport, view, onViewChange }: Props) {
   const undo = useDesignStore((state) => state.undo);
   const redo = useDesignStore((state) => state.redo);
   const tool = useDesignStore((state) => state.tool);
@@ -141,6 +142,14 @@ export function Toolbar({ onSwitchMode, onPublish, view, onViewChange }: Props) 
       <div className="topbar-spacer" />
 
       <SessionBar />
+
+      <button
+        className="button"
+        title="Load a layout from a JSON document, replacing the current one"
+        onClick={onImport}
+      >
+        Import…
+      </button>
 
       <div className="status">
         <span className="status-item" title="Bays produced by the current layout">

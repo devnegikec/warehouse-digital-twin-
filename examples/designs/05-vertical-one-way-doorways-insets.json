@@ -1,0 +1,263 @@
+{
+  "schemaVersion": 1,
+  "warehouse": {
+    "code": "WH-E",
+    "name": "Vertical aisles along Z: one-way travel, doorways, insets and reserved bays",
+    "lengthM": 36,
+    "widthM": 40,
+    "heightM": 8,
+    "origin": { "x": 0, "z": 0 },
+    "metadata": {
+      "note": "Aisles run along Z. LEFT/RIGHT resolve against the centerline direction, so A02 (drawn back to front) mirrors its sides."
+    }
+  },
+  "rackTypes": [
+    {
+      "id": "rt-std",
+      "code": "STD",
+      "name": "Standard pallet rack",
+      "bayWidthM": 2.7,
+      "depthM": 1.1,
+      "uprightWidthM": 0.12,
+      "uprightDepthM": 0.12
+    },
+    {
+      "id": "rt-wide",
+      "code": "WIDE",
+      "name": "Wide-bay bulk rack",
+      "bayWidthM": 3.6,
+      "depthM": 1.2,
+      "uprightWidthM": 0.14,
+      "uprightDepthM": 0.14,
+      "metadata": { "palletType": "CHEP 1200x1000" }
+    }
+  ],
+  "obstacles": [
+    {
+      "id": "wall-1",
+      "kind": "WALL",
+      "x": 0,
+      "z": 0,
+      "widthM": 12,
+      "depthM": 1.2,
+      "heightM": 4,
+      "metadata": { "fireRating": "REI120" }
+    },
+    {
+      "id": "col-1",
+      "kind": "COLUMN",
+      "x": 14,
+      "z": 0.6,
+      "widthM": 0.6,
+      "depthM": 0.6,
+      "heightM": 6
+    },
+    {
+      "id": "col-2",
+      "kind": "COLUMN",
+      "x": 20,
+      "z": 0.6,
+      "widthM": 0.6,
+      "depthM": 0.6,
+      "heightM": 6
+    },
+    {
+      "id": "office-1",
+      "kind": "OFFICE",
+      "x": 24,
+      "z": 0,
+      "widthM": 8,
+      "depthM": 3.5,
+      "heightM": 3.5,
+      "metadata": { "purpose": "shift office" }
+    },
+    {
+      "id": "col-3",
+      "kind": "COLUMN",
+      "x": 34,
+      "z": 0.6,
+      "widthM": 0.6,
+      "depthM": 0.6,
+      "heightM": 6
+    },
+    {
+      "id": "pil-1",
+      "kind": "PILLAR",
+      "x": 10,
+      "z": 37.5,
+      "widthM": 0.8,
+      "depthM": 0.8,
+      "heightM": 8,
+      "metadata": { "structure": "roof support" }
+    },
+    {
+      "id": "conv-1",
+      "kind": "CUSTOM",
+      "x": 20,
+      "z": 37.2,
+      "widthM": 8,
+      "depthM": 0.8,
+      "heightM": 1.2,
+      "metadata": { "purpose": "dispatch conveyor" }
+    }
+  ],
+  "aisles": [
+    {
+      "id": "a-1",
+      "code": "A01",
+      "orientation": "Z",
+      "centerline": { "x1": 6, "z1": 4, "x2": 6, "z2": 36 },
+      "widthM": 3.4,
+      "travelDirection": "FORWARD",
+      "metadata": { "gate": "dock-3", "oneWay": true },
+      "lanes": [
+        {
+          "id": "a-1-l",
+          "code": "A01-L",
+          "side": "LEFT",
+          "rackTypeId": "rt-std",
+          "startOffsetM": 0,
+          "lengthM": 32,
+          "metadata": { "skuClass": "A" },
+          "levels": [
+            { "clearHeightM": 1.4, "binDepthM": 1, "beamHeightM": 0.08, "maxWeightKg": 800 },
+            { "clearHeightM": 1.4, "binDepthM": 1, "beamHeightM": 0.08, "maxWeightKg": 800 },
+            { "clearHeightM": 1.4, "binDepthM": 1, "beamHeightM": 0.08, "maxWeightKg": 800 },
+            { "clearHeightM": 1.4, "binDepthM": 1, "beamHeightM": 0.08, "maxWeightKg": 800 },
+            { "clearHeightM": 1.4, "binDepthM": 1, "beamHeightM": 0.08, "maxWeightKg": 800 }
+          ],
+          "segments": [
+            { "kind": "RACK", "startM": 0, "endM": 24.3, "label": "racking" },
+            { "kind": "GAP", "startM": 24.3, "endM": 29.7, "label": "doorway D3" }
+          ]
+        },
+        {
+          "id": "a-1-r",
+          "code": "A01-R",
+          "side": "RIGHT",
+          "rackTypeId": "rt-wide",
+          "startOffsetM": 0,
+          "lengthM": 32,
+          "skipBays": [2],
+          "metadata": { "reservedBays": "bay 2 blocked by racking damage" },
+          "levels": [
+            { "clearHeightM": 1.4, "binDepthM": 1.1, "beamHeightM": 0.08, "maxWeightKg": 800 },
+            { "clearHeightM": 1.4, "binDepthM": 1.1, "beamHeightM": 0.08, "maxWeightKg": 800 },
+            { "clearHeightM": 1.4, "binDepthM": 1.1, "beamHeightM": 0.08, "maxWeightKg": 800 },
+            { "clearHeightM": 1.4, "binDepthM": 1.1, "beamHeightM": 0.08, "maxWeightKg": 800 },
+            { "clearHeightM": 1.4, "binDepthM": 1.1, "beamHeightM": 0.08, "maxWeightKg": 800 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "a-2",
+      "code": "A02",
+      "orientation": "Z",
+      "centerline": { "x1": 16, "z1": 36, "x2": 16, "z2": 4 },
+      "widthM": 3.4,
+      "travelDirection": "REVERSE",
+      "metadata": { "note": "centerline drawn from the far end, so LEFT is -X here" },
+      "lanes": [
+        {
+          "id": "a-2-l",
+          "code": "A02-L",
+          "side": "LEFT",
+          "rackTypeId": "rt-std",
+          "startOffsetM": 2.7,
+          "lengthM": 27,
+          "metadata": { "inset": "starts 2.7 m inside the aisle" },
+          "levels": [
+            { "clearHeightM": 1.4, "binDepthM": 1, "beamHeightM": 0.08, "maxWeightKg": 800 },
+            { "clearHeightM": 1.4, "binDepthM": 1, "beamHeightM": 0.08, "maxWeightKg": 800 },
+            { "clearHeightM": 1.4, "binDepthM": 1, "beamHeightM": 0.08, "maxWeightKg": 800 },
+            { "clearHeightM": 1.4, "binDepthM": 1, "beamHeightM": 0.08, "maxWeightKg": 800 },
+            { "clearHeightM": 1.4, "binDepthM": 1, "beamHeightM": 0.08, "maxWeightKg": 800 }
+          ]
+        },
+        {
+          "id": "a-2-r",
+          "code": "A02-R",
+          "side": "RIGHT",
+          "rackTypeId": "rt-std",
+          "startOffsetM": 5.4,
+          "lengthM": 24.3,
+          "levels": [
+            { "clearHeightM": 1.4, "binDepthM": 1, "beamHeightM": 0.08, "maxWeightKg": 800 },
+            { "clearHeightM": 1.4, "binDepthM": 1, "beamHeightM": 0.08, "maxWeightKg": 800 },
+            { "clearHeightM": 1.4, "binDepthM": 1, "beamHeightM": 0.08, "maxWeightKg": 800 },
+            { "clearHeightM": 1.4, "binDepthM": 1, "beamHeightM": 0.08, "maxWeightKg": 800 },
+            { "clearHeightM": 1.4, "binDepthM": 1, "beamHeightM": 0.08, "maxWeightKg": 800 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "a-3",
+      "code": "A03",
+      "orientation": "Z",
+      "centerline": { "x1": 26, "z1": 4, "x2": 26, "z2": 36 },
+      "widthM": 3.2,
+      "travelDirection": "BOTH",
+      "lanes": [
+        {
+          "id": "a-3-l",
+          "code": "A03-L",
+          "side": "LEFT",
+          "rackTypeId": "rt-wide",
+          "startOffsetM": 0,
+          "lengthM": 28.8,
+          "levels": [
+            { "clearHeightM": 1.6, "binDepthM": 1.1, "beamHeightM": 0.1, "maxWeightKg": 1000 },
+            { "clearHeightM": 1.6, "binDepthM": 1.1, "beamHeightM": 0.1, "maxWeightKg": 1000 },
+            { "clearHeightM": 1.6, "binDepthM": 1.1, "beamHeightM": 0.1, "maxWeightKg": 1000 },
+            { "clearHeightM": 1.6, "binDepthM": 1.1, "beamHeightM": 0.1, "maxWeightKg": 1000 }
+          ]
+        },
+        {
+          "id": "a-3-r",
+          "code": "A03-R",
+          "side": "RIGHT",
+          "rackTypeId": "rt-std",
+          "startOffsetM": 0,
+          "lengthM": 32,
+          "skipBays": [4],
+          "binCodePattern": "{warehouse}/{lane}/B{bay:03}/L{level}",
+          "levels": [
+            { "clearHeightM": 1.4, "binDepthM": 1, "beamHeightM": 0.08, "maxWeightKg": 800 },
+            { "clearHeightM": 1.4, "binDepthM": 1, "beamHeightM": 0.08, "maxWeightKg": 800 },
+            { "clearHeightM": 1.4, "binDepthM": 1, "beamHeightM": 0.08, "maxWeightKg": 800 },
+            { "clearHeightM": 1.4, "binDepthM": 1, "beamHeightM": 0.08, "maxWeightKg": 800 },
+            { "clearHeightM": 1.4, "binDepthM": 1, "beamHeightM": 0.08, "maxWeightKg": 800 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "a-4",
+      "code": "A04",
+      "orientation": "Z",
+      "centerline": { "x1": 33, "z1": 4, "x2": 33, "z2": 36 },
+      "widthM": 3.4,
+      "travelDirection": "FORWARD",
+      "lanes": [
+        {
+          "id": "a-4-l",
+          "code": "A04-L",
+          "side": "LEFT",
+          "rackTypeId": "rt-std",
+          "startOffsetM": 0,
+          "lengthM": 32,
+          "metadata": { "skuClass": "C" },
+          "levels": [
+            { "clearHeightM": 1.4, "binDepthM": 1, "beamHeightM": 0.08, "maxWeightKg": 800 },
+            { "clearHeightM": 1.4, "binDepthM": 1, "beamHeightM": 0.08, "maxWeightKg": 800 },
+            { "clearHeightM": 1.4, "binDepthM": 1, "beamHeightM": 0.08, "maxWeightKg": 800 },
+            { "clearHeightM": 1.4, "binDepthM": 1, "beamHeightM": 0.08, "maxWeightKg": 800 },
+            { "clearHeightM": 1.4, "binDepthM": 1, "beamHeightM": 0.08, "maxWeightKg": 800 }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react';
 
 import { DesignCanvas } from './scene/DesignCanvas';
 import { DiagnosticList } from './panels/DiagnosticList';
+import { ImportDialog } from './panels/ImportDialog';
 import { InspectorPanel } from './panels/InspectorPanel';
 import { MiniMap } from './panels/MiniMap';
 import { OutcomeNotice } from './panels/OutcomeNotice';
@@ -34,6 +35,7 @@ function ToolBanner() {
 
 export function DesignWorkspace({ onSwitchMode }: { onSwitchMode: () => void }) {
   const [publishing, setPublishing] = useState(false);
+  const [importing, setImporting] = useState(false);
   const [view, setView] = useState<ViewMode>('3D');
 
   // One subscription for the whole workspace, so the debounce timer is not restarted
@@ -45,6 +47,7 @@ export function DesignWorkspace({ onSwitchMode }: { onSwitchMode: () => void }) 
       <Toolbar
         onSwitchMode={onSwitchMode}
         onPublish={() => setPublishing(true)}
+        onImport={() => setImporting(true)}
         view={view}
         onViewChange={setView}
       />
@@ -76,6 +79,7 @@ export function DesignWorkspace({ onSwitchMode }: { onSwitchMode: () => void }) 
         <DiagnosticList />
       </div>
       <PublishDialog open={publishing} onClose={() => setPublishing(false)} />
+      <ImportDialog open={importing} onClose={() => setImporting(false)} />
     </div>
   );
 }

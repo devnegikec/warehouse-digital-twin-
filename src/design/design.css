@@ -1186,6 +1186,35 @@
   font-size: 11px;
   padding: 7px 10px;
 }
+
+/* ── JSON import ───────────────────────────────────────────────────────── */
+
+.json-input {
+  width: 100%;
+  min-height: 200px;
+  resize: vertical;
+  background: #0a1526;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 11px;
+  line-height: 1.5;
+  padding: 8px 10px;
+  tab-size: 2;
+}
+.json-input:focus {
+  outline: none;
+  border-color: #1d6fa5;
+}
+.json-input::placeholder {
+  color: var(--faint);
+}
+.file-input {
+  color: var(--dim);
+  font: inherit;
+  font-size: 12px;
+}
 .button-primary {
   background: #0e4a6e;
   border-color: #1d6fa5;
